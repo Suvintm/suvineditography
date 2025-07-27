@@ -41,7 +41,7 @@ function Signup() {
           }
         `}
       </style>
-      <ToastContainer position="top-center" autoClose={4000} />
+      <ToastContainer position="top-right" autoClose={4000} />
       <div
         className="bg-gradient-to-b from-[#2066cf] to-[#e3f0ff]"
         style={{

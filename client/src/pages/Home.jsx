@@ -1,21 +1,14 @@
 import React from "react";
+import Navbar from "../components/Navbar";
+import Header from "../components/Header";
+import Cardcontainer from "../components/Cardcontainer";
 
 const Home = () => {
   return (
-    <div>
-      <nav>
-        <ul>
-          <li>
-            <a href="/">Home</a>
-          </li>
-          <li>
-            <a href="/login">Login</a>
-          </li>
-          <li>
-            <a href="/signup">Sign Up</a>
-          </li>
-        </ul>
-      </nav>
+    <div className=" bg-gradient-to-b from-[#2066cf] to-[#e3f0ff] min-h-screen">
+      <Navbar />
+      <Header />
+      <Cardcontainer />
     </div>
   );
 };

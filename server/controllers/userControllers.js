@@ -5,8 +5,18 @@ import jwt from "jsonwebtoken";
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
     if (!name || !email || !password) {
       return res.json({ success: false, message: "All fields are required" });
+    }
+
+    // Check if email already exists
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res.json({
+        success: false,
+        message: "Email already registered. Please login instead.",
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -22,6 +32,7 @@ const registerUser = async (req, res) => {
     const user = await newUser.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
     res.json({
       success: true,
       message: "User registered successfully",
@@ -30,7 +41,6 @@ const registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error registering user:", error);
-
     res.json({ success: false, message: error.message });
   }
 };
@@ -62,6 +72,42 @@ const loginUser = async (req, res) => {
   } catch (error) {
     console.error("Error logging in user:", error);
     res.json({ success: false, message: error.message });
+  }
+};
+
+export const userCredit = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID missing from request",
+      });
+    }
+
+    const user = await userModel
+      .findById(userId)
+      .select("creditBalance name email");
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User credit fetched successfully",
+      data: {
+        name: user.name,
+        email: user.email,
+        credit: user.creditBalance,
+      },
+    });
+  } catch (err) {
+    console.error("Error in userCredit controller:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 

@@ -1,31 +1,48 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import logo from "../assets/logo.png";
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Signup() {
-  const [user, setuser] = useState({
+  const [user, setUser] = useState({
     name: "",
     email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const notify = () => toast("signup successful!");
 
   const handleInputChange = (e) => {
-    setuser({ ...user, [e.target.name]: e.target.value });
+    setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const onSignup = (e) => {
+  const onSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/register`,
+        user
+      );
+
+      const data = res.data;
+
+      if (data.success) {
+        toast.success("Account created successfully!");
+        setUser({ name: "", email: "", password: "" });
+        setTimeout(() => navigate("/login"), 1200);
+      } else {
+        toast.error(data.message || "Signup failed.");
+      }
+    } catch (err) {
+      console.error("Signup error:", err);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      toast.success("Account created successfully!");
-      setuser({ name: "", email: "", password: "" });
-      navigate("/login");
-    }, 1100);
+    }
   };
 
   return (
@@ -41,7 +58,7 @@ function Signup() {
           }
         `}
       </style>
-      <ToastContainer position="top-right" autoClose={4000} />
+      {/* <ToastContainer position="top-right" autoClose={4000} /> */}
       <div
         className="bg-gradient-to-b from-[#2066cf] to-[#e3f0ff]"
         style={{
@@ -140,7 +157,6 @@ function Signup() {
               />
             </div>
             <button
-              onClick={notify}
               type="submit"
               disabled={loading}
               style={{
@@ -164,7 +180,6 @@ function Signup() {
               )}
             </button>
           </form>
-
           <div
             style={{
               fontSize: "0.95rem",
@@ -187,4 +202,5 @@ function Signup() {
     </>
   );
 }
+
 export default Signup;

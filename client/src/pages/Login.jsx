@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import logo from "../assets/logo.png";
 
 function Login() {
@@ -14,13 +15,29 @@ function Login() {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const onLogin = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/login`,
+        user
+      );
       setLoading(false);
-      navigate("/");
-    }, 1100);
+      setUser({ email: "", password: "" });
+      const data = res.data;
+
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        navigate("/");
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -43,7 +60,6 @@ function Login() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-
           fontFamily: "'Roboto', Arial, sans-serif",
         }}
       >
@@ -73,7 +89,7 @@ function Login() {
           >
             Login
           </h2>
-          <form style={{ width: "100%" }} onSubmit={onLogin}>
+          <form style={{ width: "100%" }} onSubmit={onSubmit}>
             <div style={{ marginBottom: 16 }}>
               <input
                 type="email"
@@ -160,4 +176,5 @@ function Login() {
     </>
   );
 }
+
 export default Login;

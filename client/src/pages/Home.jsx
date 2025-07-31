@@ -5,7 +5,7 @@ import Cardcontainer from "../components/Cardcontainer";
 
 const Home = () => {
   return (
-    <div className=" bg-gradient-to-b from-[#2066cf] to-[#e3f0ff] min-h-screen">
+    <div className=" bg-[#8746f6] min-h-screen">
       <Navbar />
       <Header />
       <Cardcontainer />

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../assets/logo.png";
+import { toast } from "react-toastify";
 
 function Login() {
   const [user, setUser] = useState({
@@ -32,7 +33,7 @@ function Login() {
         localStorage.setItem("token", data.token);
         navigate("/");
       } else {
-        alert(data.message || "Login failed");
+        toast.error("invalid credential");
       }
     } catch (err) {
       console.error("Login error:", err);

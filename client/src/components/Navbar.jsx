@@ -1,88 +1,93 @@
-import { useState, useEffect, useRef, useContext } from "react";
 import logo from "../assets/logo.png";
+import React, { useState } from "react";
+import { FaUserCircle } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 import { Link } from "react-router-dom";
-import star from "../assets/star.png";
-import close from "../assets/close.png";
-import { AppContext } from "../context/AppContext";
+import "./Navbar.css";
 
-const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
+const Navbar = ({ user, credits }) => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const { credits } = useContext(AppContext);
-
-  // Close menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, []);
+  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex justify-between items-center py-4 px-2 bg-white shadow-md rounded-b-3xl relative">
-      {/* Logo Section */}
-      <div className="flex items-center space-x-0 sm:space-x-4">
-        <Link className="flex items-center space-x-1 font-bold" to="/">
-          <img className="h-10" src={logo} alt="Logo" />
-          <h1>suvineditography</h1>
-        </Link>
+    <nav className="bg-[#fafafa] shadow-md shadow-black px-4 py-3 flex justify-between items-center w-full rounded-b-3xl ">
+      <div className="text-xl font-bold text-blue-600 flex gap-2 items-center justify-center  ">
+        <img className="w-10 sm:w-20" src={logo} alt="" />
+        <h1 className="logoname text-black text-[15px] sm:text-3xl">
+          suvineditography
+        </h1>
       </div>
 
-      {/* Right Section */}
-      <div className="flex items-center space-x-1 sm:space-x-4">
-        {/* Credits Button */}
-        <button className="flex items-center space-x-2 bg-black sm:bg-yellow-500 text-white px-2 py-1 rounded-3xl hover:bg-black transition">
-          <img className="h-4" src={star} alt="Star" />
-          <p className="font-md text-sm">Credits: {credits}</p>
+      {/* Credit Box & Profile */}
+      <div className="flex items-center space-x-4">
+        {/* Credit Box */}
+        <div className="bg-blue-100 text-blue-700 px-3 py-1 sm:px-6 sm:py-3 sm:bg-amber-400 rounded-md text-sm font-medium">
+          Credits: {credits}
+        </div>
+
+        {/* Profile Icon */}
+        <button onClick={toggleSidebar} className="text-gray-700 text-2xl ">
+          <FaUserCircle />
         </button>
+      </div>
 
-        {/* Account Icon */}
-        <div className="relative">
-          <span
-            className="material-symbols-outlined text-white bg-black p-2 rounded-full sm:p-4 hover:bg-yellow-500 transition cursor-pointer"
-            onClick={() => setMenuOpen(true)}
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transition-transform transform ${
+          isSidebarOpen ? "translate-x-0" : "translate-x-full"
+        } z-50 p-4`}
+      >
+        {/* Close Button */}
+        <div className="flex justify-end">
+          <button onClick={toggleSidebar} className="text-2xl text-gray-600">
+            <IoMdClose />
+          </button>
+        </div>
+
+        {/* Profile Content */}
+        <div className="flex flex-col items-center mt-6 ">
+          <img
+            src={user?.profileImage || "https://via.placeholder.com/80"}
+            alt="profile"
+            className="w-20 h-20  rounded-full object-cover"
+          />
+          <h2 className="text-lg font-semibold mt-2">
+            Hello, {user?.name || "Guest"}!
+          </h2>
+        </div>
+
+        {/* Sidebar Links */}
+        <div className="mt-8 flex flex-col space-y-4 px-4">
+          <Link
+            to="/pricing"
+            className="text-black hover:text-blue-600 border-2 border-blue-500 rounded-2xl"
           >
-            account_circle
-          </span>
-
-          {/* Account Menu */}
-          {menuOpen && (
-            <div
-              ref={menuRef}
-              className="absolute right-0 top-12 bg-gradient-to-b from-blue-400 to-gray-100  text-black rounded-lg shadow-black shadow-2xl w-40 h-60 z-50"
-            >
-              <div className="flex justify-end p-2">
-                <img
-                  className="text-xl cursor-pointer"
-                  onClick={() => setMenuOpen(false)}
-                  src={close}
-                  alt="Close"
-                />
-              </div>
-              <Link className="block px-4 py-2 hover:bg-gray-100" to="/profile">
-                Profile
-              </Link>
-              <Link className="block px-4 py-2 hover:bg-gray-100" to="/pricing">
-                Pricing
-              </Link>
-              <Link className="block px-4 py-2 hover:bg-gray-100" to="/login">
-                Logout
-              </Link>
-            </div>
-          )}
+            Pricing
+          </Link>
+          <Link to="/about" className="text-gray-700 hover:text-blue-600">
+            About
+          </Link>
+          <button
+            onClick={() => {
+              // Call logout function here
+              console.log("Logged out");
+            }}
+            className="text-red-500 hover:text-red-700 text-left"
+          >
+            Logout
+          </button>
         </div>
       </div>
-    </div>
+
+      {/* Background overlay (for mobile sidebar) */}
+      {isSidebarOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black opacity-30 z-40"
+        ></div>
+      )}
+    </nav>
   );
 };
 

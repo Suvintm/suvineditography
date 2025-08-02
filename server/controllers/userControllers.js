@@ -105,9 +105,9 @@ export const userCredit = async (req, res) => {
         credit: user.creditBalance,
       },
     });
-  } catch (err) {
-    console.error("Error in userCredit controller:", err);
-    return res.status(500).json({ success: false, message: "Server error" });
+  } catch (error) {
+    console.error("Signup error:", error.response?.data || error.message);
+    toast.error(error?.response?.data?.message || "Something went wrong.");
   }
 };
 

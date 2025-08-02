@@ -1,16 +1,19 @@
 import logo from "../assets/logo.png";
-import React, { useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import React, { useState, useContext } from "react";
+
 import { IoMdClose, IoMdMenu } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
-const Navbar = ({ user, credits }) => {
+import { AppContext } from "../context/AppContext"; // Adjust the path
+
+const Navbar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   const Navigate = useNavigate();
+  const { user, credits } = useContext(AppContext);
 
   return (
     <nav className="bg-[#fafafa] absolute shadow-md shadow-black px-4 py-3 flex justify-between items-center w-full rounded-b-3xl z-10 ">
@@ -25,7 +28,7 @@ const Navbar = ({ user, credits }) => {
       <div className="flex items-center sm:gap-6 sm:pr-20 space-x-4">
         {/* Credit Box */}
         <div className="bg-black border-2 border-gray-600 text-white px-3 py-1 sm:px-6 sm:py-3 rounded-2xl sm:text-2xl text-sm font-medium">
-          Credits: 500 {credits}
+          Credits:{credits}
         </div>
 
         {/* Profile Icon */}

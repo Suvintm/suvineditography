@@ -1,177 +1,93 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import logo from "../assets/logo.png";
-import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { AppContext } from "../context/AppContext";
 
 function Login() {
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { setUser, setToken, backendUrl } = useContext(AppContext);
+
   const handleInputChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = async (e) => {
+  const onLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/user/login`,
-        user
-      );
-      setLoading(false);
-      setUser({ email: "", password: "" });
+      const res = await axios.post(`${backendUrl}/api/user/login`, form);
       const data = res.data;
 
       if (data.success) {
         localStorage.setItem("token", data.token);
-        navigate("/");
+        setToken(data.token);
+        setUser(data.user);
+
+        toast.success("Logged in successfully!");
+        setTimeout(() => navigate("/"), 1200);
       } else {
-        toast.error("invalid credential");
+        toast.error(data.message || "Invalid credentials");
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <style>
-        {`
-          @media (max-width: 480px) {
-            .login-box {
-              margin: 22px;
-              max-width: 100% !important;
-              padding: 22px 12px !important;
-            }
-          }
-        `}
-      </style>
-      <div
-        className="bg-gradient-to-b from-[#2066cf] to-[#e3f0ff]"
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontFamily: "'Roboto', Arial, sans-serif",
-        }}
-      >
-        <div
-          className="login-box"
-          style={{
-            background: "rgba(255,255,255,0.7)",
-            borderRadius: "32px",
-            boxShadow: "0 4px 32px rgba(0,0,0,0.07)",
-            padding: "38px 26px",
-            width: "100%",
-            maxWidth: "370px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <img src={logo} alt="Logo" style={{ width: 80, marginBottom: 4 }} />
-          <h2
-            style={{
-              fontWeight: 700,
-              fontSize: "2rem",
-              margin: "0 0 30px 0",
-              color: "#181818",
-              textAlign: "center",
-            }}
-          >
-            Login
-          </h2>
-          <form style={{ width: "100%" }} onSubmit={onSubmit}>
-            <div style={{ marginBottom: 16 }}>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={user.email}
-                onChange={handleInputChange}
-                style={{
-                  width: "100%",
-                  padding: "14px 16px",
-                  borderRadius: "18px",
-                  border: "1px solid #e0e0e0",
-                  fontSize: "1rem",
-                  fontFamily: "inherit",
-                  outline: "none",
-                  background: "#f7f7f7",
-                }}
-                required
-              />
-            </div>
-            <div style={{ marginBottom: 24 }}>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={user.password}
-                onChange={handleInputChange}
-                style={{
-                  width: "100%",
-                  padding: "14px 16px",
-                  borderRadius: "18px",
-                  border: "1px solid #e0e0e0",
-                  fontSize: "1rem",
-                  fontFamily: "inherit",
-                  outline: "none",
-                  background: "#f7f7f7",
-                }}
-                required
-              />
-            </div>
+      <ToastContainer position="top-right" autoClose={4000} />
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-b from-[#2066cf] to-[#e3f0ff] font-roboto">
+        <div className="login-box bg-white bg-opacity-70 rounded-3xl shadow-lg p-8 max-w-md w-full text-center">
+          <img src={logo} alt="Logo" className="w-20 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-black mb-6">Login</h2>
+          <form onSubmit={onLogin} className="space-y-4">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleInputChange}
+              required
+              className="w-full px-4 py-2 rounded-xl border bg-[#f7f7f7] outline-none"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleInputChange}
+              required
+              className="w-full px-4 py-2 rounded-xl border bg-[#f7f7f7] outline-none"
+            />
             <button
               type="submit"
               disabled={loading}
-              style={{
-                width: "100%",
-                padding: "16px 0",
-                borderRadius: "24px",
-                background: "#181818",
-                color: "#fff",
-                fontWeight: 500,
-                fontSize: "1.1rem",
-                border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
-                marginBottom: 16,
-                opacity: loading ? 0.7 : 1,
-              }}
+              className={`w-full py-2 text-white font-semibold rounded-2xl ${
+                loading ? "bg-gray-600" : "bg-black hover:bg-gray-900"
+              }`}
             >
-              {loading ? (
-                <p className="text-green-500">Logging in...</p>
-              ) : (
-                "Login"
-              )}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
-          <div
-            style={{
-              fontSize: "0.95rem",
-              color: "#606060",
-              textAlign: "center",
-            }}
-          >
-            <span>
-              New user?{" "}
-              <span
-                style={{ color: "#1a73e8", cursor: "pointer" }}
-                onClick={() => navigate("/signup")}
-              >
-                Sign Up
-              </span>
+          <p className="mt-4 text-sm text-gray-700">
+            New user?{" "}
+            <span
+              className="text-blue-600 cursor-pointer"
+              onClick={() => navigate("/signup")}
+            >
+              Sign Up
             </span>
-          </div>
+          </p>
         </div>
       </div>
     </>

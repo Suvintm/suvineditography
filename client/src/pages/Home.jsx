@@ -6,7 +6,7 @@ import Carousel from "../components/Carousel";
 
 const Home = () => {
   return (
-    <div className=" bg-[#0a080e] min-h-screen">
+    <div className=" bg-[#939393] min-h-screen">
       <Navbar />
       <Header />
       <Carousel />;

@@ -26,6 +26,12 @@ const tools = [
     image: bg,
     link: "/object-eraser",
   },
+  {
+    name: "Object Eraser",
+    desc: "Remove unwanted elements from photos.",
+    image: bg,
+    link: "/object-eraser",
+  },
 ];
 
 export default tools;

@@ -7,7 +7,7 @@ const Cardcontainer = () => {
   return (
     <section
       id="tool-container"
-      className="py-10 px-4 sm:px-8 rounded-3xl bg-white"
+      className="py-10 px-4 sm:px-8 rounded-3xl bg-white mb-10"
     >
       <h2 className="text-center text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
         Editing Tools

@@ -7,7 +7,7 @@ import Footer from "../components/Footer";
 
 const Home = () => {
   return (
-    <div className=" bg-[#939393] min-h-screen">
+    <div className=" bg-black min-h-screen">
       <Navbar />
       <Header />
       <Carousel />;

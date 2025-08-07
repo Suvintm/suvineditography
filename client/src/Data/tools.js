@@ -6,7 +6,7 @@ const tools = [
     name: "Background Remover",
     desc: "Erase image backgrounds in 1 click.",
     image: bg,
-    link: "/background-remover",
+    link: "/remove-background",
   },
   {
     name: "AI Image Generator",

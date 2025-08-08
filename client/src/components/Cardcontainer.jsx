@@ -7,9 +7,9 @@ const Cardcontainer = () => {
   return (
     <section
       id="tool-container"
-      className="py-10 px-4 sm:px-8 rounded-3xl bg-white mb-10"
+      className="py-10 px-4 sm:px-8 rounded-3xl bg-zinc-800 mb-10"
     >
-      <h2 className="text-center text-3xl sm:text-4xl font-bold text-gray-800 mb-8">
+      <h2 className="text-center text-3xl sm:text-4xl font-bold text-white mb-8">
         Editing Tools
       </h2>
 
@@ -19,7 +19,7 @@ const Cardcontainer = () => {
             id={`tool-${tool.name.replace(/\s+/g, "")}`}
             to={tool.link}
             key={index}
-            className="bg-gradient-to-br from-purple-100 to-blue-300 hover:from-purple-200 hover:to-purple-500 rounded-2xl shadow-2xl transition-all duration-300 p-5 text-center group border-2 border-gray-300 shadow-black"
+            className="bg-white hover:bg-gradient-to-br from-purple-200 hover:to-purple-500 rounded-2xl shadow-2xl transition-all duration-300 p-5 text-center group border-2 border-gray-300 shadow-black"
           >
             <img
               src={tool.image}

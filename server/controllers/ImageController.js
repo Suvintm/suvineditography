@@ -5,57 +5,75 @@ import userModel from "../model/userModel.js";
 
 const removeBgImage = async (req, res) => {
   try {
-    const {} = req.body;
+    const userId = req.user.id;
 
-    const user = await userModel.findOne({});
-
-    if (!user) {
-      return res.json({ success: false, message: "user Not Found" });
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No image uploaded" });
     }
 
-    if (user.creditBalance === 0) {
-      return res.json({
-        success: true,
-        message: "No Credit Balance",
+    // Find user
+    const user = await userModel.findById(userId);
+    if (!user) {
+      fs.unlinkSync(req.file.path);
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Check credits
+    if (user.creditBalance <= 0) {
+      fs.unlinkSync(req.file.path);
+      return res.status(403).json({
+        success: false,
+        message: "No credits remaining",
         creditBalance: user.creditBalance,
       });
     }
 
-    const imagePath = req.file.path;
+    // Prepare file for ClipDrop API
+    const formData = new FormData();
+    formData.append("image_file", fs.createReadStream(req.file.path));
 
-    const imageFile = fs.createReadStream(imagePath);
-
-    const formdata = new FormData();
-    formdata.append("image_file", imageFile);
-
+    // Call ClipDrop API
     const { data } = await axios.post(
-      "https://clipdrop-api.co/remove-background/v1.",
-      formdata,
+      "https://clipdrop-api.co/remove-background/v1",
+      formData,
       {
         headers: {
+          ...formData.getHeaders(),
           "x-api-key": process.env.CLIPDROP_API,
         },
         responseType: "arraybuffer",
       }
     );
 
+    // Convert to Base64
     const base64Image = Buffer.from(data, "binary").toString("base64");
+    const resultImage = `data:image/png;base64,${base64Image}`;
 
-    const resultImage = `dat:${req.file.mimetype};base64,${base64Image}`;
+    // Deduct 1 credit
+    user.creditBalance -= 1;
+    await user.save();
 
-    await userModel.findOneAndUpdate(user._id, {
-      creditBalance: user.creditBalance - 1,
-    });
+    // Delete temp file
+    fs.unlinkSync(req.file.path);
 
-    res.json({
+    return res.status(200).json({
       success: true,
-      resultImage,
-      creditBalance: user.creditBalance - 1,
-      message: "background-removed",
+      message: "Background removed successfully",
+      creditBalance: user.creditBalance,
+      data: resultImage,
     });
   } catch (error) {
-    console.log(error.message);
-    res.json({ success: false, message: error.message });
+    console.error("Remove BG error:", error.message);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    return res
+      .status(500)
+      .json({ success: false, message: "Background removal failed" });
   }
 };
 

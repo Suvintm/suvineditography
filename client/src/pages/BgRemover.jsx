@@ -1,143 +1,225 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
+import axios from "axios";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
+import "./BgRemover.css";
 
-const BackgroundRemover = () => {
-  const [originalImage, setOriginalImage] = useState(null);
-  const [processedImage, setProcessedImage] = useState(null);
+const BgRemover = () => {
+  const { backendUrl, token, credits, setCredits } = useContext(AppContext);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [resultImage, setResultImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [progress, setProgress] = useState(0);
+  const fileInputRef = useRef();
 
-  const handleUpload = (event) => {
-    const file = event.target.files[0];
-    setOriginalImage(file);
-    setProcessedImage(null);
-    setError("");
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      setProgress(1);
+      interval = setInterval(() => {
+        setProgress((oldProgress) => {
+          if (oldProgress >= 99) {
+            clearInterval(interval);
+            return oldProgress;
+          }
+          return oldProgress + 1;
+        });
+      }, 50);
+    } else {
+      setProgress(0);
+      if (interval) clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  const handleFileChange = (e) => {
+    setResultImage(null);
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
   };
 
   const handleRemoveBackground = async () => {
-    if (!originalImage) {
-      setError("Please upload an image first.");
+    if (!selectedImage) {
+      toast.error("Please select an image first");
       return;
     }
-
+    if (credits <= 0) {
+      toast.error("You have no credits left");
+      return;
+    }
     setLoading(true);
-    setError("");
-    setProcessedImage(null);
-
-    const formData = new FormData();
-    formData.append("image", originalImage);
 
     try {
-      const response = await fetch("http://localhost:8000/remove-bg", {
-        method: "POST",
-        body: formData,
-      });
+      const formData = new FormData();
+      formData.append("image", selectedImage);
 
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Something went wrong.");
-      }
-
-      const blob = await response.blob();
-      const imageUrl = URL.createObjectURL(blob);
-      setProcessedImage(imageUrl);
-    } catch (err) {
-      setError(
-        err.message || "Something went wrong while removing background."
+      const res = await axios.post(
+        `${backendUrl}/api/image/remove-bg`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          responseType: "json",
+        }
       );
+
+      if (res.data.success) {
+        setResultImage(res.data.data);
+        setCredits(res.data.creditBalance);
+        toast.success("Background removed successfully!");
+      } else {
+        toast.error(res.data.message || "Failed to remove background");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Background Remover Tool</h2>
+  const handleTryAnother = () => {
+    setSelectedImage(null);
+    setResultImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+      fileInputRef.current.click(); // Open file selector automatically
+    }
+  };
 
-      <input type="file" accept="image/*" onChange={handleUpload} />
-      {originalImage && (
-        <div style={styles.imageSection}>
-          <div style={styles.imageBox}>
-            <h4>Original Image</h4>
-            <img
-              src={URL.createObjectURL(originalImage)}
-              alt="Original"
-              style={styles.image}
-            />
-          </div>
-          <div style={styles.buttonBox}>
-            <button onClick={handleRemoveBackground} style={styles.button}>
-              Remove Background
-            </button>
-            {loading && <p>Processing...</p>}
-          </div>
-          <div style={styles.imageBox}>
-            <h4>Result Image</h4>
-            {processedImage && (
+  const handleDownload = () => {
+    if (!resultImage) return;
+    const link = document.createElement("a");
+    link.href = resultImage;
+    link.download = "bg-removed.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="bgremover-container">
+      <h2 className="title">Background Remover</h2>
+      <p className="credits">
+        Available Credits: <strong>{credits}</strong>
+      </p>
+
+      <label htmlFor="fileUpload" className="custom-upload-btn">
+        Choose Image
+      </label>
+      <input
+        id="fileUpload"
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        ref={fileInputRef}
+        className="file-input"
+      />
+
+      {(selectedImage || resultImage) && (
+        <div className="preview-container">
+          <div className="preview-box">
+            <h3>Original Image</h3>
+            {selectedImage ? (
               <img
-                src={processedImage}
-                alt="Result"
-                style={{ ...styles.image, backgroundColor: "transparent" }}
+                src={URL.createObjectURL(selectedImage)}
+                alt="Original"
+                className="preview-image fadeIn"
               />
+            ) : (
+              <p>No image selected</p>
             )}
+          </div>
+
+          <div className="preview-box">
+            <h3>Result</h3>
+            {loading && (
+              <div className="loader-container">
+                <div className="loader"></div>
+                <p className="loading-text">Processing...</p>
+                <div className="progress-bar">
+                  <div
+                    className="progress-bar-fill"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="progress-percent">{progress}%</p>
+              </div>
+            )}
+            {!loading && resultImage ? (
+              <div className="result-image-wrapper fadeIn">
+                <div className="checkerboard-bg" />
+                <img
+                  src={resultImage}
+                  alt="Background Removed"
+                  className="preview-image result-image"
+                />
+              </div>
+            ) : !loading ? (
+              <p>Result will appear here</p>
+            ) : null}
           </div>
         </div>
       )}
 
-      {error && <p style={styles.error}>{error}</p>}
+      {/* Buttons row on desktop */}
+      <div className="buttons-row desktop-buttons">
+        <button
+          className="btn btn-primary"
+          onClick={handleRemoveBackground}
+          disabled={loading || !selectedImage}
+        >
+          Remove Background
+        </button>
+
+        <button
+          className="btn btn-secondary"
+          onClick={handleTryAnother}
+          disabled={loading && !resultImage && !selectedImage}
+        >
+          Try Another
+        </button>
+
+        <button
+          className="btn btn-download"
+          onClick={handleDownload}
+          disabled={!resultImage}
+        >
+          Download Image
+        </button>
+      </div>
+
+      {/* Buttons row on mobile */}
+      <div className="buttons-row mobile-buttons">
+        <button
+          className="btn btn-primary"
+          onClick={handleRemoveBackground}
+          disabled={loading || !selectedImage}
+        >
+          Remove Background
+        </button>
+
+        <button
+          className="btn btn-secondary"
+          onClick={handleTryAnother}
+          disabled={loading && !resultImage && !selectedImage}
+        >
+          Try Another
+        </button>
+
+        <button
+          className="btn btn-download"
+          onClick={handleDownload}
+          disabled={!resultImage}
+        >
+          Download Image
+        </button>
+      </div>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    padding: "2rem",
-    maxWidth: "800px",
-    margin: "0 auto",
-    fontFamily: "Arial, sans-serif",
-  },
-  heading: {
-    fontSize: "28px",
-    fontWeight: "bold",
-    marginBottom: "1rem",
-    textAlign: "center",
-  },
-  imageSection: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "1rem",
-    marginTop: "1rem",
-  },
-  imageBox: {
-    flex: 1,
-    textAlign: "center",
-  },
-  image: {
-    width: "100%",
-    maxWidth: "300px",
-    objectFit: "contain",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-  },
-  buttonBox: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "0.5rem",
-  },
-  button: {
-    padding: "10px 20px",
-    backgroundColor: "#4CAF50",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    marginTop: "1rem",
-  },
-};
-
-export default BackgroundRemover;
+export default BgRemover;

@@ -6,6 +6,7 @@ import Home from "./pages/Home.jsx";
 import BgRemover from "./pages/BgRemover.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BgOwnModel from "./pages/BgOwnModel.jsx";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/background-remover" element={<BgRemover />} />
+        <Route path="/svn-bg-remover" element={<BgOwnModel />} />
       </Routes>
       <ToastContainer position="top-right" autoClose={4000} />
     </div>

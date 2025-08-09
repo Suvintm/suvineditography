@@ -4,12 +4,14 @@ import Header from "../components/Header";
 import Cardcontainer from "../components/Cardcontainer";
 import Carousel from "../components/Carousel";
 import Footer from "../components/Footer";
+import BtnOwnModel from "../components/BtnOwnModel";
 
 const Home = () => {
   return (
     <div className=" bg-black min-h-screen">
       <Navbar />
       <Header />
+      <BtnOwnModel />
       <Carousel />;
       <Cardcontainer />
       <Footer />

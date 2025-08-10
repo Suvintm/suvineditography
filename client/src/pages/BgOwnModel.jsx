@@ -1,97 +1,96 @@
-import React, { useState } from "react";
-import "./BgOwnModel.css";
+import React, { useContext, useState } from "react";
+import { AppContext } from "../context/AppContext";
 
-export default function BgOwnModel() {
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [resultUrl, setResultUrl] = useState(null);
+const BgOwnModel = () => {
+  const { token } = useContext(AppContext);
+  const [image, setImage] = useState(null);
+  const [processedImage, setProcessedImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  // Python API endpoint
+  const PYTHON_API_URL = "http://127.0.0.1:8000/remove-bg";
 
   const handleFileChange = (e) => {
-    const selected = e.target.files[0];
-    setFile(selected);
-    if (selected) {
-      setPreview(URL.createObjectURL(selected));
-      setResultUrl(null);
-    }
+    setImage(e.target.files[0]);
+    setProcessedImage(null);
   };
 
-  const handleRemoveBackground = async () => {
-    if (!file) {
-      setError("Please select an image first.");
+  const handleSubmit = async () => {
+    if (!image) {
+      alert("Please select an image first!");
       return;
     }
-    setError("");
-    setLoading(true);
-    setResultUrl(null);
+    if (!token) {
+      alert("No token found! Please log in.");
+      return;
+    }
 
+    setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", image); // must match FastAPI's "file" param
 
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("User not logged in");
-
-      const response = await fetch("http://localhost:8010/remove", {
+      const res = await fetch(PYTHON_API_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // JWT token from localStorage
+          Authorization: `Bearer ${token}`, // Don't set Content-Type, browser sets it
         },
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed: ${response.status} ${response.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} ${res.statusText}`);
       }
 
-      // Get processed image as blob
-      const blob = await response.blob();
-      setResultUrl(URL.createObjectURL(blob));
-    } catch (err) {
-      setError(err.message);
+      const blob = await res.blob();
+      setProcessedImage(URL.createObjectURL(blob));
+    } catch (error) {
+      console.error("Error removing background:", error);
+      alert("Background removal failed.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-remover-container">
-      <h2>Background Remover</h2>
+    <div style={{ padding: "20px" }}>
+      <h2>Background Removal</h2>
+
       <input type="file" accept="image/*" onChange={handleFileChange} />
+      <br />
 
-      {preview && (
-        <div className="preview-container">
-          <h4>Preview:</h4>
-          <img src={preview} alt="Preview" className="preview-image" />
-        </div>
-      )}
+      <button onClick={handleSubmit} disabled={loading}>
+        {loading ? "Processing..." : "Remove Background"}
+      </button>
 
-      {loading ? (
-        <p className="loading-text">⏳ Removing background...</p>
-      ) : (
-        file && (
-          <button className="remove-btn" onClick={handleRemoveBackground}>
-            Remove Background
-          </button>
-        )
-      )}
+      <div style={{ marginTop: "20px" }}>
+        {image && (
+          <div>
+            <h4>Original Image:</h4>
+            <img
+              src={URL.createObjectURL(image)}
+              alt="Original"
+              style={{ maxWidth: "300px" }}
+            />
+          </div>
+        )}
 
-      {error && <p className="error-text">⚠️ {error}</p>}
-
-      {resultUrl && (
-        <div className="result-container">
-          <h4>Result:</h4>
-          <img src={resultUrl} alt="Result" className="result-image" />
-          <a
-            href={resultUrl}
-            download="bg_removed.png"
-            className="download-link"
-          >
-            ⬇ Download Result
-          </a>
-        </div>
-      )}
+        {processedImage && (
+          <div>
+            <h4>Processed Image:</h4>
+            <img
+              src={processedImage}
+              alt="Processed"
+              style={{ maxWidth: "300px" }}
+            />
+            <a href={processedImage} download="processed.png">
+              Download
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default BgOwnModel;

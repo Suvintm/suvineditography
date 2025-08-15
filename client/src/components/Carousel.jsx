@@ -35,19 +35,19 @@ const scrollToTool = (toolName) => {
 
 const Carousel = () => {
   return (
-    <div className="relative w-11/12 sm:w-4/5 py-5  px-4 sm:py-14 sm:px-10 bg-gradient-to-b from-purple-600 to-white m-auto mt-6 rounded-2xl">
+    <div className="relative w-11/12 sm:w-4/5 py-5  px-4 sm:py-14 sm:px-10 bg-gradient-to-t from-black to-indigo-600 m-auto mt-6 rounded-2xl">
       {/* Heading */}
       <h2 className="text-center text-2xl sm:text-3xl font-bold mb-6 text-white">
         Explore Our Powerful <br /> Tools
       </h2>
 
       {/* Custom Left Arrow */}
-      <button className="custom-swiper-prev absolute top-1/2 -translate-y-1/2 left-2 z-20 p-2 bg-purple-400 text-white rounded-full font-bold shadow hover:bg-gray-200 transition-all">
+      <button className="custom-swiper-prev absolute top-1/2 -translate-y-1/2 left-2 z-20 p-2 bg-gradient-to-r from-black to-indigo-600 text-white rounded-full font-bold shadow hover:bg-gray-200 transition-all">
         <ChevronLeft size={24} />
       </button>
 
       {/* Custom Right Arrow */}
-      <button className="custom-swiper-next absolute top-1/2 -translate-y-1/2 right-2 z-20 p-2 bg-purple-400 text-white rounded-full shadow hover:bg-gray-200 transition-all">
+      <button className="custom-swiper-next absolute top-1/2 -translate-y-1/2 right-2 z-20 p-2 bg-gradient-to-r from-black to-indigo-600   text-white rounded-full shadow hover:bg-gray-200 transition-all">
         <ChevronRight size={24} />
       </button>
 
@@ -82,7 +82,7 @@ const Carousel = () => {
               />
 
               {/* Tool name and description */}
-              <h3 className="text-xl font-semibold text-gray-800">
+              <h3 className="text-xl font-semibold text-pink-800">
                 {tool.name}
               </h3>
               <p className="text-gray-500 text-sm mt-2">{tool.desc}</p>
@@ -90,7 +90,7 @@ const Carousel = () => {
               {/* Scroll-to-container button */}
               <button
                 onClick={() => scrollToTool(tool.name)}
-                className="mt-2 px-4 py-2 font-bold bg-gradient-to-r from-purple-600 to-purple-400 text-white rounded-full text-sm hover:bg-purple-700 transition"
+                className="mt-2 px-4 py-2 font-bold bg-gradient-to-r from-black to-indigo-600 text-white rounded-full text-sm hover:bg-purple-700 transition"
               >
                 Try Now
               </button>

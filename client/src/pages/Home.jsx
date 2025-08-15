@@ -6,6 +6,7 @@ import Carousel from "../components/Carousel";
 import Footer from "../components/Footer";
 import BtnOwnModel from "../components/BtnOwnModel";
 import FreeToolContainer from "../components/FreeToolsContainer";
+import GoToStudio from "../components/GoToStudioCard";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
       <Header />
       <BtnOwnModel />
       <Carousel />;
+      <GoToStudio />
       <FreeToolContainer />
       <Cardcontainer />
       <Footer />

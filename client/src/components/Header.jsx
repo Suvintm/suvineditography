@@ -10,7 +10,7 @@ const Header = () => {
   };
 
   return (
-    <div className="pt-18 h-100 bg-gradient-to-b from-purple-900 to-purple-400 w-full rounded-[12px] sm:pt-28 sm:h-140">
+    <div className="pt-18 h-100 bg-gradient-to-b from-black to-indigo-600 w-full rounded-[12px] sm:pt-28 sm:h-140">
       {/* Top Section: Two side-by-side divs */}
       <div className="flex flex-row justify-between sm:gap-4">
         {/* Left: Text Content */}
@@ -39,7 +39,7 @@ const Header = () => {
       <div className="text-center p-10 mt-1 text-white">
         <button
           onClick={handleScrollToTools}
-          className="bg-gradient-to-l from-purple-600 to-black text-light sm:text-[20px] shadow-4xl shadow-black font-semibold px-6 py-2 sm:px-12 sm:py-4 rounded-3xl hover:translate-z-40 transition-all duration-200"
+          className="bg-gradient-to-r from-black to-indigo-200 sm:text-[20px] shadow-4xl shadow-black font-semibold px-6 py-2 sm:px-12 sm:py-4 rounded-3xl hover:translate-z-40 transition-all duration-200"
         >
           Get Started
         </button>

@@ -5,6 +5,7 @@ import Cardcontainer from "../components/Cardcontainer";
 import Carousel from "../components/Carousel";
 import Footer from "../components/Footer";
 import BtnOwnModel from "../components/BtnOwnModel";
+import FreeToolContainer from "../components/FreeToolsContainer";
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
       <Header />
       <BtnOwnModel />
       <Carousel />;
+      <FreeToolContainer />
       <Cardcontainer />
       <Footer />
     </div>

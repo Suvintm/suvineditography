@@ -21,7 +21,7 @@ const Header = () => {
             Editography
           </h1>
           <p className="text-white text-[15px] sm:text-3xl">
-            Creative video editing at your fingertips.
+            Creative editing at your fingertips.
           </p>
         </div>
 

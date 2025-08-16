@@ -30,12 +30,13 @@ export default function ProjectContainer({ projects = [] }) {
   const displayProjects = projects.length > 0 ? projects : dummyProjects;
 
   return (
-    <div className="mt-6 bg-zinc-900 p-10 rounded-xl">
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="mt-6 bg-zinc-900 p-4 sm:p-10 rounded-xl">
+      {/* 2 per row on mobile */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {displayProjects.map((project) => (
           <div
             key={project._id}
-            className="bg-zinc-100 rounded-xl shadow hover:shadow-lg transition p-3 cursor-pointer"
+            className="bg-zinc-100 rounded-xl shadow hover:shadow-lg transition p-2 sm:p-3 cursor-pointer"
             onClick={() =>
               (window.location.href = `/studio/editor/${project._id}`)
             }
@@ -43,12 +44,12 @@ export default function ProjectContainer({ projects = [] }) {
             <img
               src={project.thumbnailUrl || "/placeholder.jpg"}
               alt={project.name}
-              className="w-full h-40 object-cover rounded-lg mb-3"
+              className="w-full h-28 md:h-40 object-cover rounded-lg mb-2 sm:mb-3"
             />
-            <h3 className="text-lg font-medium text-gray-800">
+            <h3 className="text-sm sm:text-lg font-medium text-gray-800 truncate">
               {project.name}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               Last edited: {new Date(project.updatedAt).toLocaleDateString()}
             </p>
           </div>

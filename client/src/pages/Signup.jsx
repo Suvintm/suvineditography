@@ -46,28 +46,45 @@ function Signup() {
   return (
     <>
       <ToastContainer position="top-right" autoClose={4000} />
-      <div className="min-h-screen flex justify-center items-center bg-gradient-to-b from-[#2066cf] to-[#e3f0ff] font-roboto">
-        <div className="signup-box bg-white bg-opacity-70 rounded-3xl shadow-lg p-8 max-w-md w-full text-center">
-          <img src={logo} alt="Logo" className="w-20 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-black mb-6">Create Account</h2>
-          <form onSubmit={onSignup} className="space-y-4">
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-black via-indigo-500 to-black px-4">
+        <div
+          className="signup-box bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl 
+          p-6 sm:p-10 max-w-md w-full text-center 
+          scale-95 sm:scale-100"
+        >
+          {" "}
+          {/* 👈 Shrinks slightly on mobile */}
+          {/* Logo */}
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-16 sm:w-20 mx-auto mb-6 animate-fadeIn" // 👈 smaller logo on mobile
+          />
+          {/* Heading */}
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-6 tracking-tight">
+            Create Account
+          </h2>
+          {/* Form */}
+          <form onSubmit={onSignup} className="space-y-3 sm:space-y-4">
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleInputChange}
-              placeholder="Name"
+              placeholder="Full Name"
               required
-              className="w-full px-4 py-2 rounded-xl border bg-[#f7f7f7] outline-none"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl border border-gray-500 
+              focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 bg-gray-50 outline-none transition-all"
             />
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleInputChange}
-              placeholder="Email"
+              placeholder="Email Address"
               required
-              className="w-full px-4 py-2 rounded-xl border bg-[#f7f7f7] outline-none"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl border border-gray-500 
+              focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 bg-gray-50 outline-none transition-all"
             />
             <input
               type="password"
@@ -76,22 +93,28 @@ function Signup() {
               onChange={handleInputChange}
               placeholder="Password"
               required
-              className="w-full px-4 py-2 rounded-xl border bg-[#f7f7f7] outline-none"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 rounded-xl border border-gray-500 
+              focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400 bg-gray-50 outline-none transition-all"
             />
+
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 text-white font-semibold rounded-2xl ${
-                loading ? "bg-gray-600" : "bg-black hover:bg-gray-900"
+              className={`w-full py-2 sm:py-3 text-white font-semibold rounded-xl shadow-md transition-all duration-300 ${
+                loading
+                  ? "bg-green-300 cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-600 to-black hover:opacity-90"
               }`}
             >
               {loading ? "Creating..." : "Sign Up"}
             </button>
           </form>
-          <p className="mt-4 text-sm text-gray-700">
+          {/* Footer */}
+          <p className="mt-6 text-xs sm:text-sm text-gray-700">
             Already have an account?{" "}
             <span
-              className="text-blue-600 cursor-pointer"
+              className="text-indigo-600 font-semibold cursor-pointer hover:underline"
               onClick={() => navigate("/login")}
             >
               Login

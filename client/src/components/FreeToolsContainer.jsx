@@ -24,7 +24,7 @@ const FreeToolsContainer = () => {
   return (
     <section className="relative py-10 px-4 sm:px-8 rounded-3xl bg-gradient-to-r from-black to-indigo-600 mb-5">
       {/* Free Tools Label */}
-      <div className="absolute top-2 left-4 sm:left-8 bg-gradient-to-r from-black to-green-900 text-white pl-3 sm:pl-4 py-2 w-[180px] sm:w-[200px] rounded-xl shadow-lg">
+      <div className="absolute top-2 left-4 sm:left-8 bg-gradient-to-r from-black to-green-400 text-white pl-3 sm:pl-4 py-2 w-[180px] sm:w-[200px] rounded-xl shadow-lg">
         <h4 className="text-base sm:text-lg font-bold">Free Tools</h4>
         <p className="text-[9px] sm:text-[10px] mt-1 text-gray-100">
           100% free to use with unlimited access.

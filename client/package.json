@@ -12,6 +12,8 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.11.0",
+    "fabric": "^6.7.1",
+    "fabric-pure-browser": "^5.1.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.536.0",
     "react": "^19.1.0",

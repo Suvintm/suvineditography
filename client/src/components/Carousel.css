@@ -1,0 +1,37 @@
+/* src/components/carousel.css */
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #53575c;
+  font: bold;
+}
+
+.swiper-pagination-bullet {
+  background: #bbb;
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #360378;
+}
+
+/* src/components/carousel.css */
+/* src/components/carousel.css */
+/* Bounce animation to highlight tool card */
+.bounce-highlight {
+  animation: bounceBorder 1s ease;
+  border: 3px solid #9333ea !important;
+  border-radius: 20px;
+}
+
+@keyframes bounceBorder {
+  0%,
+  100% {
+    transform: scale(1);
+    border-color: #9333ea;
+  }
+  50% {
+    transform: scale(1.04);
+    border-color: #a855f7;
+  }
+}

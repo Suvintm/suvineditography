@@ -1,0 +1,14 @@
+/* Toast general overrides */
+.Toastify__toast-container {
+  width: auto !important;
+  max-width: 320px !important; /* Prevent full width on mobile */
+  right: 1rem !important;
+  left: auto !important;
+  top: 1rem !important;
+}
+
+.Toastify__toast {
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+}

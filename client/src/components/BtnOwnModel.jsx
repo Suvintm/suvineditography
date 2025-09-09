@@ -6,19 +6,19 @@
 
 //   return (
 //     <div>
-//       <button
-//         onClick={() => navigate("/svn-bg-remover")}
-//         style={{
-//           padding: "10px 20px",
-//           background: "#28a745",
-//           color: "#fff",
-//           border: "none",
-//           borderRadius: 4,
-//           cursor: "pointer",
-//         }}
-//       >
-//         Open Background Remover
-//       </button>
+      // <button
+      //   onClick={() => navigate("/svn-bg-remover")}
+      //   style={{
+      //     padding: "10px 20px",
+      //     background: "#28a745",
+      //     color: "#fff",
+      //     border: "none",
+      //     borderRadius: 4,
+      //     cursor: "pointer",
+      //   }}
+      // >
+      //   Open Background Remover
+      // </button>
 //     </div>
 //   );
 // };

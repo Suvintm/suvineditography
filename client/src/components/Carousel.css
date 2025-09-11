@@ -7,12 +7,12 @@
 }
 
 .swiper-pagination-bullet {
-  background: #bbb;
+  background: #5f5f5f;
   opacity: 1;
 }
 
 .swiper-pagination-bullet-active {
-  background: #360378;
+  background: #2600ff;
 }
 
 /* src/components/carousel.css */
@@ -28,7 +28,7 @@
   0%,
   100% {
     transform: scale(1);
-    border-color: #9333ea;
+    border-color: #4833ff;
   }
   50% {
     transform: scale(1.04);

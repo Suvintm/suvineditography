@@ -35,9 +35,9 @@ const scrollToTool = (toolName) => {
 
 const Carousel = () => {
   return (
-    <div className="relative w-11/12 sm:w-4/5 py-5  px-4 sm:py-14 sm:px-10 bg-gradient-to-t from-black to-indigo-600 m-auto mt-6 rounded-2xl">
+    <div className="relative w-11/12 sm:w-auto py-5  px-4 sm:py-14 sm:px-10 sm:mx-10 bg-gradient-to-t from-black to-indigo-600 m-auto mt-30 rounded-2xl">
       {/* Heading */}
-      <h2 className="text-center text-2xl sm:text-3xl font-bold mb-6 text-white">
+      <h2 className="text-center text-[20px] sm:text-3xl font-bold mb-2 sm:mb-6 text-white">
         Explore Our Powerful <br /> Tools
       </h2>
 
@@ -73,12 +73,12 @@ const Carousel = () => {
         {/* Render each tool as a slide */}
         {tools.map((tool, index) => (
           <SwiperSlide key={index}>
-            <div className="bg-white border border-white  rounded-2xl shadow-md p-2 sm:p-6 pb-6 text-center hover:shadow-xl transition duration-300">
+            <div className="bg-white border border-white  rounded-2xl shadow-md p-2 sm:p-6 pb-6 sm:pb-10 text-center hover:shadow-xl transition duration-300">
               {/* Tool image */}
               <img
                 src={tool.image}
                 alt={tool.name}
-                className="w-60 h-60 object-cover rounded-2xl mb-4 m-auto border border-gray-300"
+                className="w-50 h-40 object-cover rounded-2xl mb-4 m-auto border border-gray-300"
               />
 
               {/* Tool name and description */}

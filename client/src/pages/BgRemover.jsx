@@ -3,6 +3,8 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import "./BgRemover.css";
+import { IoMdReturnLeft } from "react-icons/io";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const BgRemover = () => {
   const { backendUrl, token, credits, setCredits } = useContext(AppContext);
@@ -11,6 +13,8 @@ const BgRemover = () => {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef();
+
+  const navigate=useNavigate()
 
   useEffect(() => {
     let interval;
@@ -102,6 +106,10 @@ const BgRemover = () => {
 
   return (
     <div className="bgremover-container">
+      <IoMdReturnLeft
+        onClick={() => navigate("/")}
+        className="absolute bg-black ml-2 rounded-3xl border-2 border-zinc-500 border-dashed w-8 h-8 p-2 mt-4"
+      />
       <h2 className="title">Background Remover</h2>
       <p className="credits">
         Available Credits: <strong>{credits}</strong>

@@ -9,8 +9,14 @@ const AppContextProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [projects, setProjects] = useState([]);
 
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+  const [activeCategory, setActiveCategory] = useState("Images");
+  const [activeSubCategoryImage, setActiveSubCategoryImage] = useState("");
+  const [activesourceImage, setActiveSourceImage] = useState("All");
+
+  const [activesourceVideo, setActiveSourceVideo] = useState("All");
+  const [activeSubCategoryVideo, setActiveSubCategoryVideo] = useState("All");
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const loadCreditData = async () => {
     try {
@@ -46,6 +52,16 @@ const AppContextProvider = ({ children }) => {
         setToken,
         projects, // <-- provide projects
         setProjects,
+        activeCategory,
+        setActiveCategory,
+        activeSubCategoryImage,
+        setActiveSubCategoryImage,
+        activesourceImage,
+        setActiveSourceImage,
+        activesourceVideo,
+        setActiveSourceVideo,
+        activeSubCategoryVideo,
+        setActiveSubCategoryVideo,
       }}
     >
       {children}

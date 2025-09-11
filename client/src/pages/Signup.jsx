@@ -5,6 +5,7 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 import { AppContext } from "../context/AppContext";
+import playNotificationSound from "../utils/playSound.js";
 
 function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -29,14 +30,16 @@ function Signup() {
         localStorage.setItem("token", data.token);
         setToken(data.token);
         setUser(data.user);
-
+        playNotificationSound();
         toast.success("Account created successfully!");
         setTimeout(() => navigate("/"), 1200);
       } else {
+        playNotificationSound();
         toast.error(data.message || "Signup failed");
       }
     } catch (error) {
       console.error("Signup error:", error);
+      playNotificationSound();
       toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);

@@ -5,6 +5,7 @@ import axios from "axios";
 import logo from "../assets/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 import { AppContext } from "../context/AppContext";
+import playNotificationSound from "../utils/playSound.js";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -29,14 +30,16 @@ function Login() {
         localStorage.setItem("token", data.token);
         setToken(data.token);
         setUser(data.user);
-
+        playNotificationSound();
         toast.success("Logged in successfully!");
+
         setTimeout(() => navigate("/"), 1200);
       } else {
         toast.error(data.message || "Invalid credentials");
       }
     } catch (err) {
       console.error("Login error:", err);
+      playNotificationSound();
       toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);

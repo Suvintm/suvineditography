@@ -1,11 +1,13 @@
 import logo from "../assets/logo.png";
 import React, { useState, useContext } from "react";
 
-import { IoMdClose, IoMdMenu } from "react-icons/io";
+import { IoMdClose,IoIosPricetags, IoMdMenu, IoIosOptions } from "react-icons/io";
+import {RiHeartFill, RiHome7Line, RiHomeSmileLine, RiMenuFold2Fill, RiMenuUnfold2Fill, RiMoneyCnyBoxFill, RiProfileFill, RiProfileLine} from "react-icons/ri"
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 import { AppContext } from "../context/AppContext"; // Adjust the path
+import { Coins, CoinsIcon, Gem, Gift, IndianRupee, InfoIcon, LogOutIcon, LucideUserCheck2, MenuIcon, MenuSquareIcon, UserPen, WalletIcon } from "lucide-react";
 
 const Navbar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -15,81 +17,149 @@ const Navbar = () => {
   const Navigate = useNavigate();
   const { user, credits } = useContext(AppContext);
 
+  const handleScrollToTools = () => {
+    const element = document.getElementById("studio-go");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <nav className="bg-[#fafafa] absolute shadow-md shadow-black px-4 py-3 flex justify-between items-center w-full rounded-b-3xl z-10 ">
       <div className="text-xl font-bold text-blue-600 flex gap-2 items-center justify-center  ">
         <img className="w-10 sm:w-20" src={logo} alt="" />
-        <h1 className="logoname text-black text-[15px] sm:text-3xl">
-          suvineditography
+        <h1 className=" logoname text-black text-[15px] sm:text-3xl">
+          SUVINAI
         </h1>
+      </div>
+      {/* menu bar */}
+      <div className="hidden sm:block">
+        <ul className="flex flex-row gap-6 font-bold">
+          <li
+            onClick={handleScrollToTools}
+            className="flex gap-2 hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl p-2 flex-row"
+          >
+            <RiHome7Line className="w-8 h-6" />
+            Studio
+          </li>
+          <li className=" flex gap-2 hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl p-2">
+            <Gift />
+            FreeTools
+          </li>
+          <li className="flex gap-2 hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl p-2">
+            <Gem /> ProTools
+          </li>
+          <li className="hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl flex gap-2 p-2">
+            <IoIosPricetags className="w-6 h-6" />
+            <p>Pricing</p>
+          </li>
+        </ul>
       </div>
 
       {/* Credit Box & Profile */}
       <div className="flex items-center sm:gap-6 sm:pr-20 space-x-4">
         {/* Credit Box */}
-        <div className="bg-black border-2 border-gray-600 text-white px-3 py-1 sm:px-6 sm:py-3 rounded-2xl sm:text-2xl text-sm font-medium">
-          Credits:{credits}
-        </div>
+        <Link
+          to="/buy-credit"
+          className="flex gap-1 sm:gap-2  bg-black border-2  text-white px-3 py-1 sm:px-4 sm:py-2 rounded-3xl items-center-safe sm:text-[20px] text-[12px] font-medium"
+        >
+          <WalletIcon className="w-4 h-4 sm:w-6 sm:h-6" />{" "}
+          <span className="hidden sm:block">Credits</span>: {credits}
+        </Link>
 
         {/* Profile Icon */}
         <button
           onClick={toggleSidebar}
           className="text-black text:[60px] sm:text-6xl "
         >
-          <IoMdMenu />
+          <IoIosOptions className="w-6 h-6 sm:w-8 sm:h-8" />
+          {/* <IoMdMenu /> */}
         </button>
       </div>
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 sm:w-90 bg-gradient-to-b from-purple-600 to-white shadow-lg transition-transform transform ${
+        className={`fixed top-0 right-0 h-screen rounded-3xl ml-4 mt-0 mb-4 w-64 sm:w-120 bg-white shadow-lg transition-transform transform ${
           isSidebarOpen ? "translate-x-0" : "translate-x-full"
         } z-50 p-4`}
       >
         {/* Close Button */}
+
         <div className="flex justify-end">
           <button
             onClick={toggleSidebar}
-            className="text-2xl text-white font-extrabold"
+            className="text-2xl text-black font-extrabold"
           >
             <IoMdClose />
           </button>
         </div>
+        <div>
+          <h1 className="font-bold text-center mx-8 p-1  bg-zinc-300 sm:mx-15 rounded-2xl sm:p-2 sm:text-2xl">
+            Profile & Menu{" "}
+          </h1>
+        </div>
 
         {/* Profile Content */}
-        <div className="flex flex-col border-purple-400 border-2 rounded-3xl shadow-2xl shadow-black  items-center mt-6 p-4  ">
-          <img
-            src={logo}
-            alt="profile"
-            className="w-20 h-20  rounded-full object-cover"
-          />
-          <h2 className="text-lg font-semibold mt-2">
-            Hello, {user?.name || "Guest"}!
-          </h2>
+        {/* Profile Content */}
+        <div className="flex flex-col border-white border-1 rounded-3xl shadow-2xl text-black shadow-black items-center mt-6 p-4">
+          <div className="flex items-center gap-2 sm:gap-6 w-full">
+            <div className="rounded-full border-2 border-zinc-500 overflow-hidden max-w-16 max-h-16 sm:max-w-20 sm:max-h-20 items-center-safe text-center">
+              <img
+                src={user?.avatar || logo}
+                alt="profile"
+                className="w-20 h-20 rounded-full object-cover"
+              />
+            </div>
+            <div className="flex flex-col">
+              <div className="flex sm:gap-2 gap-0 text-[12px] sm:text-[18px] text-zinc-600">
+                <LucideUserCheck2 className="w-4 h-4 sm:w-6 sm:h-6" />
+                <span>{user?.username || "Guest"}</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold mt-2 sm:text-2xl">
+                  {user?.name || "Guest"}
+                </h2>
+              </div>
+              {/* Total Uploads */}
+              <div className="mt-2 text-zinc-700 text-[12px] sm:text-[16px] font-medium flex items-center gap-2">
+                <RiProfileFill className="text-blue-600 sm:w-5 sm:h-5" />
+                <span>Total Uploads: {user?.uploads?.length || 0}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-2 border-zinc-400 flex items-center rounded-3xl w-full mt-4">
+            <RiHeartFill className="text-red-600 sm:w-6 sm:h-6 m-2" />
+            <div className="w-full">
+              <p className="text-zinc-700 text-[8px] p-1 font-bold sm:text-[15px]">
+                Thank you for being a SuvinEditography user...
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar Links */}
-        <div className="mt-8 flex flex-col space-y-4 px-4">
+        <div className="mt-8 flex flex-col items-center justify-center-safe space-y-4 px-4">
           <Link
             to="/pricing"
-            className="border-purple-400 bg-white p-2 border-2 rounded-3xl shadow-2xl  shadow-black font-bold text-center text-black hover:text-blue-700 "
+            className="flex justify-center bg-black min-w-40  sm:min-w-60 p-1 sm:p-2  rounded-3xl shadow-2xl  shadow-black font-semibold  text-center text-white hover:text-black hover:bg-white hover:border-1 hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
-            Pricing
+            <IndianRupee className="w-4 h-4  sm:w-5 sm:h-5" /> Pricing
           </Link>
           <Link
             to="/about"
-            className="border-purple-400 bg-white p-2 border-2 rounded-3xl shadow-2xl  shadow-black font-bold text-center text-black hover:text-blue-700"
+            className="flex justify-center bg-black min-w-40  sm:min-w-60 p-1 sm:p-2  rounded-3xl shadow-2xl  shadow-black font-semibold  text-center text-white hover:text-black hover:bg-white hover:border-1 hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
-            About
+            <InfoIcon className="w-4 h-4  sm:w-5 sm:h-5" /> About
           </Link>
           <button
             onClick={() => {
               Navigate("/login");
               console.log("Logged out");
             }}
-            className="border-purple-400 bg-white p-2 border-2 rounded-3xl shadow-2xl  shadow-black font-bold text-center text-red-500 hover:text-red-700 "
+            className="flex justify-center bg-black min-w-40  sm:min-w-60 p-1 sm:p-2  rounded-3xl shadow-2xl  shadow-black font-semibold  text-center text-white hover:text-black hover:bg-white hover:border-1 hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
-            Logout
+            <LogOutIcon className="w-4 h-4  sm:w-5 sm:h-5" /> Logout
           </button>
         </div>
       </div>

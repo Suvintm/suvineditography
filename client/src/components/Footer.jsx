@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-r from-purple-900 via-purple-700 to-purple-500 text-white py-10 px-6 sm:px-12">
+    <footer className="bg-white rounded-t-3xl text-black py-10 px-6 sm:px-12">
       {/* Top Grid: Logo + Links */}
       <div className="max-w-7xl mx-auto grid sm:grid-cols-3 gap-10">
         {/* Logo and brand */}

@@ -1,4 +1,3 @@
-// server/controllers/projectController.js
 import projectModel from "../model/projectModel.js";
 import cloudinary from "../config/cloudinary.js";
 import mongoose from "mongoose";
@@ -33,15 +32,14 @@ const destroyIfExists = async (publicId) => {
   } catch {}
 };
 
-// Create project (user only provides projectName)
+// Create project
 export const createProject = async (req, res) => {
   try {
-    const { projectName } = req.body;
-    if (!projectName) {
+    const { projectName, canvasWidth = 600, canvasHeight = 600 } = req.body;
+    if (!projectName)
       return res
         .status(400)
         .json({ success: false, message: "projectName is required" });
-    }
 
     const defaultCanvasState = { objects: [], background: "#ffffff" };
     const defaultThumbnailURL =
@@ -53,6 +51,8 @@ export const createProject = async (req, res) => {
       userId: req.user.id,
       projectName,
       canvasState: defaultCanvasState,
+      canvasWidth,
+      canvasHeight,
       imageURL: defaultThumbnailURL,
       imagePublicId: defaultThumbnailPublicId,
     });
@@ -84,19 +84,17 @@ export const getProjects = async (req, res) => {
 // Get single project
 export const getProjectById = async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
       return res
         .status(400)
         .json({ success: false, message: "Invalid project ID" });
-    }
 
     const project = await projectModel.findById(req.params.id);
     if (!project)
       return res.status(404).json({ success: false, message: "Not found" });
 
-    if (!project.userId.equals(req.user.id)) {
+    if (!project.userId.equals(req.user.id))
       return res.status(403).json({ success: false, message: "Forbidden" });
-    }
 
     return res.json({ success: true, project });
   } catch (err) {
@@ -110,28 +108,33 @@ export const getProjectById = async (req, res) => {
 // Update project
 export const updateProject = async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
       return res
         .status(400)
         .json({ success: false, message: "Invalid project ID" });
-    }
 
-    const { projectName, canvasState, imageDataURL } = req.body;
+    const {
+      projectName,
+      canvasState,
+      canvasWidth,
+      canvasHeight,
+      imageDataURL,
+    } = req.body;
     const project = await projectModel.findById(req.params.id);
     if (!project)
       return res.status(404).json({ success: false, message: "Not found" });
 
-    if (!project.userId.equals(req.user.id)) {
+    if (!project.userId.equals(req.user.id))
       return res.status(403).json({ success: false, message: "Forbidden" });
-    }
 
     if (projectName) project.projectName = projectName;
-    if (canvasState) {
+    if (canvasState)
       project.canvasState =
         typeof canvasState === "string" ? JSON.parse(canvasState) : canvasState;
-    }
+    if (canvasWidth) project.canvasWidth = canvasWidth;
+    if (canvasHeight) project.canvasHeight = canvasHeight;
 
-    if (req.file && req.file.buffer) {
+    if (req.file?.buffer) {
       const uploaded = await uploadBufferToCloudinary(req.file.buffer);
       await destroyIfExists(project.imagePublicId);
       project.imageURL = uploaded.secure_url;
@@ -157,19 +160,17 @@ export const updateProject = async (req, res) => {
 // Delete project
 export const deleteProject = async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id))
       return res
         .status(400)
         .json({ success: false, message: "Invalid project ID" });
-    }
 
     const project = await projectModel.findById(req.params.id);
     if (!project)
       return res.status(404).json({ success: false, message: "Not found" });
 
-    if (!project.userId.equals(req.user.id)) {
+    if (!project.userId.equals(req.user.id))
       return res.status(403).json({ success: false, message: "Forbidden" });
-    }
 
     await destroyIfExists(project.imagePublicId);
     await project.deleteOne();

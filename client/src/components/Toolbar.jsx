@@ -11,6 +11,8 @@ import {
   Contrast,
   Eraser,
   Palette,
+  RectangleHorizontal,
+  ZoomIn,
 } from "lucide-react";
 
 const Toolbar = () => {
@@ -18,6 +20,8 @@ const Toolbar = () => {
 
   const tools = [
     { name: "addImage", label: "Image", icon: ImageIcon },
+    { name: "ratio", label: "Ratio", icon: RectangleHorizontal },
+    { name: "zoom", label: "Zoom", icon: ZoomIn },
     { name: "text", label: "Text", icon: Type },
     { name: "crop", label: "Crop", icon: Crop },
     { name: "adjust", label: "Adjust", icon: Contrast },
@@ -26,7 +30,7 @@ const Toolbar = () => {
     { name: "shapes", label: "Shapes", icon: Shapes },
     { name: "erase", label: "Erase", icon: Eraser },
     { name: "scissor", label: "Scissor", icon: Scissors },
-    { name: "background", label: "BG Color", icon: Palette }, // ✅ new background tool
+    { name: "background", label: "BG Color", icon: Palette },
   ];
 
   return (

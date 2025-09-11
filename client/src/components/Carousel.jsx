@@ -9,7 +9,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 // Optional custom styles (for bounce effect)
-import "./carousel.css";
+import "./Carousel.css";
 
 // Import your tool data (images, names, etc.)
 import tools from "../Data/tools";

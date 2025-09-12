@@ -1,3 +1,13 @@
 venv/
 model/venv/
 .env
+# Python virtual environment folders
+venv/
+env/
+ENV/
+.venv/
+.pyenv/
+
+# Python environment files
+*.env
+.env.*

@@ -32,6 +32,7 @@ function Signup() {
         setUser(data.user);
         playNotificationSound();
         toast.success("Account created successfully!");
+        console.log("User after signup:", data.user);
         setTimeout(() => navigate("/"), 1200);
       } else {
         playNotificationSound();

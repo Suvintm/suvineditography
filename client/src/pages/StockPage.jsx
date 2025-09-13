@@ -1,179 +1,357 @@
-import React, { useEffect, useState, useRef } from "react";
-import StockCard from "../components/StockCard";
-import StockDetailModal from "../components/StockDetailModal";
-import { getStocks } from "../services/stockService";
-import { Link } from "react-router-dom";
+// client/src/pages/StockPage.jsx
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { BadgeCheck, Download, Search, Loader2, X, Tag } from "lucide-react"; // icons
+import "react-toastify/dist/ReactToastify.css";
 
-// Stock types
-const DEFAULT_TYPES = ["all", "image", "video", "audio", "icon", "png"];
-
-// Categories (main + subcategories)
-const CATEGORIES_BY_TYPE = {
-  all: ["all", "nature", "people", "tech", "abstract", "food", "business"],
-  image: ["all", "nature", "people", "tech", "abstract", "food"],
-  video: ["all", "travel", "music", "sports", "tutorial"],
-  audio: ["all", "music", "sfx", "ambient"],
-  icon: ["all", "ui", "social", "arrow"],
-  png: ["all", "sticker", "overlay"],
-};
-
-// Example subcategories for main categories
-const SUBCATEGORIES = {
-  nature: ["forest", "mountains", "ocean", "flowers"],
-  people: ["portraits", "family", "friends", "business"],
-  tech: ["gadgets", "ai", "robotics"],
-  travel: ["beach", "city", "adventure"],
-  music: ["pop", "rock", "classical"],
-};
+const DEFAULT_TYPES = ["all", "image", "video", "audio", "music"];
+const DEFAULT_CATEGORIES = [
+  "all",
+  "posters",
+  "banners",
+  "flyers",
+  "wallpapers",
+  "others",
+];
 
 export default function StockPage() {
-  const [type, setType] = useState("all");
-  const [category, setCategory] = useState("all");
-  const [subcategory, setSubcategory] = useState("all");
-  const [q, setQ] = useState("");
   const [stocks, setStocks] = useState([]);
+  const [types] = useState(DEFAULT_TYPES);
+  const [categories] = useState(DEFAULT_CATEGORIES);
+
+  const [activeType, setActiveType] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [downloading, setDownloading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
 
-  const searchTimer = useRef(null);
-
-  useEffect(() => {
-    fetchStocks();
-    setSubcategory("all"); // reset subcategory when main category changes
-  }, [type, category]);
-
-  useEffect(() => {
-    if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => {
-      fetchStocks();
-    }, 450);
-    return () => clearTimeout(searchTimer.current);
-  }, [q, subcategory]);
-
-  const fetchStocks = async (page = 1) => {
-    setLoading(true);
+  // fetch stocks
+  const fetchStocks = async () => {
     try {
+      setLoading(true);
       const params = {};
-      if (type && type !== "all") params.type = type;
-      if (category && category !== "all")
-        params.category = category.toLowerCase();
-      if (subcategory && subcategory !== "all")
-        params.subcategory = subcategory.toLowerCase();
-      if (q) params.q = q;
-      params.page = page;
-      params.limit = 36;
+      if (activeType && activeType !== "all") params.type = activeType;
+      if (activeCategory && activeCategory !== "all")
+        params.category = activeCategory;
+      if (search) params.search = search;
 
-      const data = await getStocks(params);
-      const arr = Array.isArray(data)
-        ? data
-        : data.stocks || data.results || [];
-      setStocks(arr);
-    } catch (e) {
-      console.error("Fetch stocks error", e);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/stocks`,
+        {
+          params,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setStocks(res.data.stocks || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch stocks");
     } finally {
       setLoading(false);
     }
   };
 
-  const openDetail = (s) => setSelected(s);
-  const closeDetail = () => setSelected(null);
+  useEffect(() => {
+    fetchStocks();
+  }, [activeType, activeCategory, search]);
+
+  // fetch auto suggestions (simple version: query every keystroke)
+  const fetchSuggestions = async (q) => {
+    if (!q) return setSuggestions([]);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/stocks`,
+        {
+          params: { search: q },
+        }
+      );
+      setSuggestions(res.data.stocks.slice(0, 5)); // top 5
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDownload = async (stock) => {
+    try {
+      setDownloading(true);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/stocks/${stock._id}/download`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const link = document.createElement("a");
+      link.href = stock.url;
+      link.download = stock.originalFileName || "download";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Download started!");
+      setSelectedStock(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Download failed");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
-        <h1 className="text-2xl font-bold">Stock Library</h1>
-        <Link
-          to="/stocks/upload"
-          className="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
-        >
-          Upload
-        </Link>
-      </div>
+    <div className="min-h-screen flex flex-col bg-blue-50">
+      {/* Navbar */}
+      <nav className="bg-white  px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <img src="/logo.png" alt="logo" className="w-8 h-8" />
+          <span className="font-bold text-lg">SuvinEditography</span>
+        </div>
+      </nav>
 
-      <div className="mb-6 space-y-3">
-        {/* Stock types */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar">
-          {DEFAULT_TYPES.map((t) => (
+      <div className="p-4 space-y-4 flex-1">
+        {/* Search bar */}
+        <div className="relative w-full max-w-lg mx-auto">
+          <div className="flex items-center  rounded-full bg-white px-3 py-2 ">
+            <Search className="w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search stocks..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                fetchSuggestions(e.target.value);
+              }}
+              className="flex-1 px-3 outline-none rounded-full"
+            />
+          </div>
+          {suggestions.length > 0 && (
+            <ul className="absolute left-0 right-0 bg-white shadow rounded-lg mt-1 z-10">
+              {suggestions.map((s) => (
+                <li
+                  key={s._id}
+                  onClick={() => {
+                    setSearch(s.title);
+                    setSuggestions([]);
+                  }}
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  {s.title}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Type scroll bar */}
+        <div className="flex space-x-2 overflow-x-auto pb-2">
+          {types.map((t) => (
             <button
               key={t}
-              onClick={() => {
-                setType(t);
-                setCategory("all");
-                setSubcategory("all");
-              }}
-              className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
-                t === type
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300"
+              onClick={() => setActiveType(t)}
+              className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+                activeType === t
+                  ? "bg-black border-1 border-white text-white"
+                  : "bg-white text-black hover:bg-gray-100"
               }`}
             >
-              {t}
+              {t.toUpperCase()}
             </button>
           ))}
         </div>
 
-        {/* Search input */}
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by title, tags..."
-          className="w-full border px-3 py-2 rounded-lg focus:ring focus:ring-blue-300"
-        />
-
-        {/* Main Categories */}
-        <div className="flex gap-2 overflow-x-auto no-scrollbar">
-          {(CATEGORIES_BY_TYPE[type] || CATEGORIES_BY_TYPE.all).map((c) => (
-            <button
-              key={c}
-              onClick={() => {
-                setCategory(c.toLowerCase());
-                setSubcategory("all"); // reset subcategory
-              }}
-              className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
-                category === c.toLowerCase()
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-
-        {/* Subcategories (if available) */}
-        {category !== "all" && SUBCATEGORIES[category] && (
-          <div className="flex gap-2 overflow-x-auto no-scrollbar mt-2">
-            {["all", ...SUBCATEGORIES[category]].map((sub) => (
+        {/* Category scroll bar */}
+        {activeType !== "all" && (
+          <div className="flex space-x-2  overflow-x-auto pb-2">
+            {categories.map((c) => (
               <button
-                key={sub}
-                onClick={() => setSubcategory(sub.toLowerCase())}
-                className={`px-4 py-1.5 rounded-full text-sm whitespace-nowrap ${
-                  subcategory === sub.toLowerCase()
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
+                key={c}
+                onClick={() => setActiveCategory(c)}
+                className={`px-4 py-2 rounded-full  whitespace-nowrap transition ${
+                  activeCategory === c
+                    ? "bg-green-600 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                {sub}
+                {c.toUpperCase()}
               </button>
+            ))}
+          </div>
+        )}
+
+        {/* Loader */}
+        {loading && (
+          <div className="flex justify-center py-10">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          </div>
+        )}
+
+        {/* Stocks grid */}
+        {!loading && (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4    rounded-3xl">
+            {stocks.map((stock) => (
+              <div
+                key={stock._id}
+                className="bg-white border-1 border-white rounded-3xl overflow-hidden flex flex-col hover:shadow-lg transition"
+              >
+                {/* Preview */}
+                {/* Preview */}
+                <div className="w-full bg-black flex justify-center items-center">
+                  {stock.type === "video" ? (
+                    <video
+                      src={stock.url}
+                      controls
+                      className="w-full max-h-80 object-contain"
+                    />
+                  ) : stock.type === "audio" || stock.type === "music" ? (
+                    <audio src={stock.url} controls className="w-full" />
+                  ) : (
+                    <img
+                      src={stock.url}
+                      alt={stock.title}
+                      className="w-full max-h-80 object-contain"
+                    />
+                  )}
+                </div>
+
+                <div className="p-3 flex flex-col flex-1">
+                  {/* Uploader */}
+                  <div className="flex items-center space-x-2">
+                    <img
+                      src="/logo.png"
+                      alt="uploader"
+                      className="w-7 h-7 rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">Uploaded by</span>
+                      <span className="sm:text-sm text-[12px] font-medium flex items-center">
+                        {stock.uploaderName}
+                        {stock.uploaderName === "suvineditography" && (
+                          <BadgeCheck className="w-3 h-4 text-blue-500 ml-1" />
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-semibold text-sm mt-2">{stock.title}</h3>
+
+                  {/* Tags */}
+                  {stock.tags && stock.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {stock.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="flex items-center text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                        >
+                          <Tag className="w-3 h-3 mr-1" />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Status */}
+                  <span
+                    className={`mt-2 inline-block w-15 items-center-safe justify-center-safe px-4 py-0.5 text-xs rounded-full mb-1 ${
+                      stock.status === "free"
+                        ? "bg-green-400 text-white"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {stock.status.toUpperCase()}
+                  </span>
+
+                  {/* Download btn */}
+                  <button
+                    onClick={() => setSelectedStock(stock)}
+                    className="mt-auto bg-black text-white gap-1 py-1.5 px-3 rounded-md flex items-center text-[12px] justify-center hover:bg-blue-700 transition"
+                  >
+                    <span>View &</span>
+                    <Download className="w-4 h-4 mr-1  " />
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Stock grid */}
-      {loading ? (
-        <div className="text-center py-10 text-gray-500">Loading...</div>
-      ) : stocks.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">No results found</div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {stocks.map((s) => (
-            <StockCard key={s._id} stock={s} onOpen={openDetail} />
-          ))}
+      {/* Popover modal for download */}
+      {selectedStock && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button
+              onClick={() => setSelectedStock(null)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg font-bold mb-2">{selectedStock.title}</h2>
+            <p className="text-sm text-gray-600 mb-1">
+              Uploaded by: {selectedStock.uploaderName}
+            </p>
+            <p className="text-sm text-gray-600 mb-1">
+              Category: {selectedStock.category} | Type: {selectedStock.type}
+            </p>
+            <p
+              className={`text-sm text-gray-600 w-20 rounded-3xl pl-6 p-2 mb-3 ${
+                selectedStock.status === "free"
+                  ? "bg-green-400 text-white"
+                  : "bg-yellow-100 text-yellow-700"
+              }`}
+            >
+              {selectedStock.status === "free" ? "Free" : "Paid"}
+            </p>
+
+            <div className="bg-white border border-black  rounded-3xl p-3 mb-4">
+              <p className="text-xs text-gray-500 mb-1">Original File</p>
+              <a
+                href={selectedStock.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 text-sm break-all"
+              >
+                <img
+                  src={selectedStock.url}
+                  alt={selectedStock.title}
+                  className="mt-2 rounded-md"
+                />
+              </a>
+            </div>
+
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleDownload(selectedStock)}
+                disabled={downloading}
+                className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+              >
+                {downloading ? (
+                  <span className="flex items-center justify-center">
+                    <Loader2 className="w-4 h-4 animate-spin mr-1" />{" "}
+                    Downloading
+                  </span>
+                ) : (
+                  "Confirm Download"
+                )}
+              </button>
+              <button
+                onClick={() => setSelectedStock(null)}
+                className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      {selected && <StockDetailModal stock={selected} onClose={closeDetail} />}
     </div>
   );
 }

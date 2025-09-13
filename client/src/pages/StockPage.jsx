@@ -177,7 +177,7 @@ export default function StockPage() {
                 onClick={() => setActiveCategory(c)}
                 className={`px-4 py-2 rounded-full  whitespace-nowrap transition ${
                   activeCategory === c
-                    ? "bg-green-600 text-white"
+                    ? "bg-green-500 text-white"
                     : "bg-white text-gray-600 hover:bg-gray-100"
                 }`}
               >

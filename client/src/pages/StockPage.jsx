@@ -237,6 +237,7 @@ export default function StockPage() {
                         {stock.uploaderName}
                         {stock.uploaderName === "suvineditography" && (
                           
+                           
                           <CheckBadgeIcon className="w-3 h-4 text-blue-500 ml-1" />
                         )}
                       </span>

@@ -1,12 +1,10 @@
-// controllers/stockController.js
+// controllers/adminStockController.js
 import Stock from "../model/stockModel.js";
-import User from "../model/userModel.js";
 import slugify from "slugify";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
-import path from "path";
 
-// helper to generate unique slug
+// Helper to generate unique slug
 const generateUniqueSlug = async (title) => {
   const base = slugify(title, { lower: true, strict: true });
   let slug = base;
@@ -18,15 +16,11 @@ const generateUniqueSlug = async (title) => {
   return slug;
 };
 
-// Upload stock (admin and user use same endpoint)
-export const uploadStock = async (req, res) => {
+// Upload stock (Admin only)
+export const uploadStockAdmin = async (req, res) => {
   try {
-    const user = req.user;
-    if (!user) return res.status(401).json({ message: "Unauthorized" });
-
     if (!req.file) return res.status(400).json({ message: "File is required" });
 
-    // collect body fields
     const {
       title,
       description = "",
@@ -34,16 +28,16 @@ export const uploadStock = async (req, res) => {
       category,
       subcategory = "",
       tags = "",
-      status,
+      status = "free",
     } = req.body;
 
     if (!title || !type || !category) {
       return res
         .status(400)
-        .json({ message: "title, type and category are required" });
+        .json({ message: "Title, type, and category are required" });
     }
 
-    // upload to cloudinary
+    // Upload to Cloudinary
     const resourceType = ["video", "audio", "music"].includes(type)
       ? "video"
       : "image";
@@ -59,14 +53,10 @@ export const uploadStock = async (req, res) => {
 
     const result = await cloudinary.uploader.upload(filePath, uploadOptions);
 
-    // remove local file
-    try {
-      fs.unlinkSync(filePath);
-    } catch (e) {
-      /* ignore */
-    }
+    // Remove local file
+    fs.unlinkSync(filePath);
 
-    // tags processing
+    // Process tags
     const tagsArray = tags
       ? tags
           .split(",")
@@ -81,14 +71,14 @@ export const uploadStock = async (req, res) => {
       description,
       type,
       url: result.secure_url,
-      thumbnailUrl: result.secure_url, // you can change to a different derived thumbnail if needed
+      thumbnailUrl: result.secure_url,
       category,
       subcategory,
       tags: tagsArray,
-      status: user.isAdmin && status ? status : "free",
-      uploadedBy: user._id,
-      uploaderName: user.isAdmin ? "SuvinEditography" : user.name,
-      isAdminUploader: !!user.isAdmin,
+      status,
+      uploadedBy: null, // Admin doesn't have a User ID
+      uploaderName: "suvineditography",
+      isAdminUploader: true,
       width: result.width,
       height: result.height,
       duration: result.duration,
@@ -101,70 +91,37 @@ export const uploadStock = async (req, res) => {
 
     await newStock.save();
 
-    res.status(201).json({ message: "Stock uploaded", stock: newStock });
+    res
+      .status(201)
+      .json({ message: "Stock uploaded successfully", stock: newStock });
   } catch (err) {
-    console.error("uploadStock error:", err);
+    console.error("uploadStockAdmin error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-// GET stocks: supports all / type / category filters
-export const getStocks = async (req, res) => {
+
+// Get all stocks (Admin)
+export const getStocksAdmin = async (req, res) => {
   try {
-    const user = req.user;
-    const { search, category, type, tags, my } = req.query;
+    const { search, category, type, tags } = req.query;
+    const query = {};
 
-    // 🔹 If 'my' is true → return only user's uploads
-    if (my && user) {
-      const stocks = await Stock.find({ uploadedBy: user._id }).sort({
-        createdAt: -1,
-      });
-      return res.status(200).json({ stocks });
-    }
+    if (category) query.category = category;
+    if (type) query.type = type;
+    if (tags)
+      query.tags = { $in: tags.split(",").map((t) => t.trim().toLowerCase()) };
+    if (search) query.$text = { $search: search };
 
-    // 🔹 Build query
-    const q = {};
-
-    // Type filter (skip if "all")
-    if (type && type !== "all") {
-      q.type = type;
-    }
-
-    // Category filter (skip if "all")
-    if (category && category !== "all") {
-      q.category = category;
-    }
-
-    // Tags filter
-    if (tags) {
-      q.tags = { $in: tags.split(",").map((t) => t.trim().toLowerCase()) };
-    }
-
-    // Search filter
-    if (search) {
-      q.$text = { $search: search };
-    }
-
-    // 🔹 Access Control
-    if (user && user.isAdmin) {
-      // Admin sees all
-      const stocks = await Stock.find(q).sort({ createdAt: -1 });
-      return res.status(200).json({ stocks });
-    } else {
-      // Normal users/public see only free stocks OR their own
-      q.$or = [{ status: "free" }];
-      if (user) q.$or.push({ uploadedBy: user._id });
-
-      const stocks = await Stock.find(q).sort({ createdAt: -1 });
-      return res.status(200).json({ stocks });
-    }
+    const stocks = await Stock.find(query).sort({ createdAt: -1 });
+    res.status(200).json({ stocks });
   } catch (err) {
-    console.error("getStocks error:", err);
+    console.error("getStocksAdmin error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-// Get single stock by id or slug
-export const getStockById = async (req, res) => {
+// Get single stock by ID or slug
+export const getStockByIdAdmin = async (req, res) => {
   try {
     const { idOrSlug } = req.params;
     const stock = /^[0-9a-fA-F]{24}$/.test(idOrSlug)
@@ -173,31 +130,22 @@ export const getStockById = async (req, res) => {
 
     if (!stock) return res.status(404).json({ message: "Stock not found" });
 
-    // If stock is premium, only admin or uploader can fetch full details (optional)
-    // For now we return data; UI should handle access control for downloads.
-
     res.status(200).json({ stock });
   } catch (err) {
-    console.error("getStockById error:", err);
+    console.error("getStockByIdAdmin error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-// Update stock (title, description, category, tags, status) — only uploader or admin
-export const updateStock = async (req, res) => {
+// Update stock (Admin can edit any)
+export const updateStockAdmin = async (req, res) => {
   try {
-    const user = req.user;
     const { id } = req.params;
     const { title, description, category, subcategory, tags, status } =
       req.body;
 
     const stock = await Stock.findById(id);
     if (!stock) return res.status(404).json({ message: "Stock not found" });
-
-    const isOwner = stock.uploadedBy.toString() === user._id.toString();
-    if (!isOwner && !user.isAdmin) {
-      return res.status(403).json({ message: "Forbidden" });
-    }
 
     if (title && title !== stock.title) {
       stock.title = title.trim();
@@ -206,41 +154,31 @@ export const updateStock = async (req, res) => {
     if (description !== undefined) stock.description = description;
     if (category) stock.category = category;
     if (subcategory !== undefined) stock.subcategory = subcategory;
-    if (tags !== undefined) {
+    if (tags !== undefined)
       stock.tags = tags
         .split(",")
         .map((t) => t.trim().toLowerCase())
         .filter(Boolean);
-    }
-
-    // Only admin can change status
-    if (status && user.isAdmin) stock.status = status;
+    if (status) stock.status = status;
 
     await stock.save();
-    res.status(200).json({ message: "Stock updated", stock });
+    res.status(200).json({ message: "Stock updated successfully", stock });
   } catch (err) {
-    console.error("updateStock error:", err);
+    console.error("updateStockAdmin error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-// Delete stock — only uploader or admin
-export const deleteStock = async (req, res) => {
+// Delete stock (Admin only)
+export const deleteStockAdmin = async (req, res) => {
   try {
-    const user = req.user;
     const { id } = req.params;
     const stock = await Stock.findById(id);
     if (!stock) return res.status(404).json({ message: "Stock not found" });
 
-    const isOwner = stock.uploadedBy.toString() === user._id.toString();
-    if (!isOwner && !user.isAdmin) {
-      return res.status(403).json({ message: "Forbidden" });
-    }
-
-    // delete from Cloudinary if we have public id
+    // Delete from Cloudinary
     if (stock.cloudPublicId) {
       try {
-        // resource_type should be video for video/audio else image
         const resourceType = ["video", "audio", "music"].includes(stock.type)
           ? "video"
           : "image";
@@ -253,15 +191,15 @@ export const deleteStock = async (req, res) => {
     }
 
     await Stock.findByIdAndDelete(id);
-    res.status(200).json({ message: "Stock deleted" });
+    res.status(200).json({ message: "Stock deleted successfully" });
   } catch (err) {
-    console.error("deleteStock error:", err);
+    console.error("deleteStockAdmin error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-// increment download count (call when user downloads)
-export const incrementDownload = async (req, res) => {
+// Increment download count
+export const incrementDownloadAdmin = async (req, res) => {
   try {
     const { id } = req.params;
     const stock = await Stock.findById(id);
@@ -274,7 +212,7 @@ export const incrementDownload = async (req, res) => {
       .status(200)
       .json({ message: "Download recorded", downloads: stock.downloads });
   } catch (err) {
-    console.error("incrementDownload error:", err);
+    console.error("incrementDownloadAdmin error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

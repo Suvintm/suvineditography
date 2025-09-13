@@ -9,6 +9,10 @@ import userRouter from "./routes/userRoute.js";
 import imageRouter from "./routes/imageRoute.js";
 import projectRouter from "./routes/projectRoute.js";
 import stockRouter from "./routes/stockRoute.js";
+//admin
+import adminStockRouter from "./routes/adminStockRoute.js";
+import adminRouter from "./routes/adminRoute.js";
+ 
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -23,6 +27,11 @@ app.use("/api/user", userRouter);
 app.use("/api/image", imageRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/stocks", stockRouter);
+//// Admin routes
+app.use("/api/admin", adminRouter);
+
+// Admin stock routes
+app.use("/api/admin/stocks", adminStockRouter);
 
 app.get("/", (req, res) => res.send("Hello from SuvinEditography backend"));
 

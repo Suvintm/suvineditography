@@ -1,47 +1,41 @@
+// routes/stockRoute.js
 import express from "express";
-import multer from "multer";
-import path from "path";
+import authMiddleware from "../middleware/authMiddleware.js";
+import upload from "../middleware/stockmulter.js";
 import {
   uploadStock,
-  getMyStocks,
   getStocks,
   getStockById,
   updateStock,
   deleteStock,
-  changeStatus,
-  getStocksByUser,
+  incrementDownload,
 } from "../controllers/stockController.js";
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// multer setup - store temp files in /tmp/uploads
-const uploadDir = path.join(process.cwd(), "tmp", "uploads");
-import fs from "fs";
-fs.mkdirSync(uploadDir, { recursive: true });
+// Get stocks (admin all or filtered; regular users get free)
+router.get("/", authMiddleware, getStocks);
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 9)}${ext}`);
-  },
+// Get single stock by id or slug (public or auth — require auth if you want)
+router.get("/view/:idOrSlug", getStockById);
+
+// Upload (both admin and user) - form field should be "file"
+router.post("/upload", authMiddleware, upload.single("file"), uploadStock);
+
+// Get my stocks (explicit)
+router.get("/my", authMiddleware, async (req, res) => {
+  // convenience route (calls getStocks with my flag)
+  req.query.my = "1";
+  return getStocks(req, res);
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 1024 * 1024 * 150 }, // 150MB limit (adjust if needed)
-});
+// Update metadata
+router.put("/:id", authMiddleware, updateStock);
 
-router.post("/upload", protect, upload.single("file"), uploadStock);
-router.get("/mine", protect, getMyStocks);
-router.get("/", getStocks);
-router.get("/user/:userId", getStocksByUser);
-router.get("/:id", getStockById);
-router.put("/:id", protect, upload.single("file"), updateStock);
-router.delete("/:id", protect, deleteStock);
-router.patch("/:id/status", protect, adminOnly, changeStatus);
+// Delete
+router.delete("/:id", authMiddleware, deleteStock);
+
+// Increment download
+router.post("/:id/download", incrementDownload);
 
 export default router;

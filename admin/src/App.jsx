@@ -1,9 +1,13 @@
 import React from 'react'
+import { Route, Routes } from "react-router-dom";
+import AdminHome from './pages/AdminHome';
 
 const App = () => {
   return (
     <div>
-      <h1>admin panel</h1>
+       <Routes>
+        <Route path="/admin" element={<AdminHome/>}/>
+       </Routes>
     </div>
   )
 }

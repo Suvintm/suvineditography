@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BadgeCheck, Download, Search, Loader2, X, Tag } from "lucide-react"; // icons
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import "react-toastify/dist/ReactToastify.css";
 
 const DEFAULT_TYPES = ["all", "image", "video", "audio", "music"];
@@ -235,7 +236,8 @@ export default function StockPage() {
                       <span className="sm:text-sm text-[12px] font-medium flex items-center">
                         {stock.uploaderName}
                         {stock.uploaderName === "suvineditography" && (
-                          <BadgeCheck className="w-3 h-4 text-blue-500 ml-1" />
+                          
+                          <CheckBadgeIcon className="w-3 h-4 text-blue-500 ml-1" />
                         )}
                       </span>
                     </div>

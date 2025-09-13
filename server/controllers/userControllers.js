@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-export const userCredit = async (req, res) => {
+const userCredit = async (req, res) => {
   try {
     const userId = req.user?.id;
 

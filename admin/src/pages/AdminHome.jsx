@@ -1,12 +1,11 @@
-import React from 'react'
-
-const AdminHome = () => {
+export default function AdminHome() {
   return (
-    <div className='items-center justify-center p-10 bg-green-400'>
-      <h1 className='text-3xl font-bold' >Admin Dashboard</h1>
-      <p>Welcome to the admin panel.</p>
+    <div className="bg-white p-6 rounded-lg shadow">
+      <h2 className="text-2xl font-semibold mb-4">Welcome, Admin!</h2>
+      <p className="text-gray-600">
+        Control and maintain your website from here. Use the sidebar to navigate
+        to different sections.
+      </p>
     </div>
-  )
+  );
 }
-
-export default AdminHome

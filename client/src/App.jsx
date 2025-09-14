@@ -8,7 +8,10 @@ import BgOwnModel from "./pages/BgOwnModel.jsx";
 import StudioHome from "./pages/StudioHome.jsx";
 import StudioEditor from "./pages/StudioEditor.jsx"; // <-- you forgot this import earlier
 import StockUpload from "./pages/StockUpload.jsx"; // <-- new
-import StockPage from "./pages/StockPage.jsx"; // <-- new
+import StockMainPage from "./pages/StockMainPage.jsx";
+import UnsplashStock from "./pages/UnsplashStock.jsx"; 
+import PixabayStock from "./pages/PixabayStock.jsx";
+import StockPage from "./pages/StockPage.jsx";// <-- new
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,7 +32,12 @@ const App = () => {
         <Route path="/studio/editor" element={<StudioEditor />} />
         <Route path="/studio/editor/:id" element={<StudioEditor />} />
         {/* Stock Routes */}
-        <Route path="/stocks" element={<StockPage />} /> {/* public browsing */}
+        <Route path="/stocks" element={<StockMainPage />}>
+          <Route path="suvineditography" element={<StockPage />} />
+          <Route path="unsplash" element={<UnsplashStock />} />
+          <Route path="pixabay" element={<PixabayStock />} />
+        </Route>
+        {/* public browsing */}
         <Route path="/stocks/upload" element={<StockUpload />} />{" "}
         {/* logged-in users */}
       </Routes>

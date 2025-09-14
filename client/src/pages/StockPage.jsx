@@ -126,13 +126,13 @@ export default function StockPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-blue-50">
-      {/* Navbar */}
+      {/* Navbar
       <nav className="bg-white  px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <img src="/logo.png" alt="logo" className="w-8 h-8" />
           <span className="font-bold text-lg">SuvinEditography</span>
         </div>
-      </nav>
+      </nav> */}
 
       <div className="p-4 space-y-4 flex-1">
         {/* Search bar */}

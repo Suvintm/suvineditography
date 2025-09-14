@@ -21,12 +21,22 @@ import { Boxes } from "lucide-react";
 import img1 from "../assets/header1.jpg";
 import img2 from "../assets/header2.jpg";
 import img3 from "../assets/header3.jpg";
+import img4 from "../assets/header4.jpg";
+import img5 from "../assets/header5.jpg";
+import img6 from "../assets/header6.jpg";
+import img7 from "../assets/header7.jpg";
+
+
 
 // ✅ Array with image + text
 const carouselSlides = [
+  { image: img5, text: "Photography Profession" },
+  { image: img6, text: "Nature Vibe" },
+  { image: img7, text: "Creativity On Wall" },
   { image: img1, text: "Bring Your Videos to Life" },
   { image: img2, text: "Edit Smarter, Not Harder" },
   { image: img3, text: "Creative Power at Your Fingertips" },
+  { image: img4, text: "Creative Power at Your Fingertips" },
 ];
 
 const SearchOptions = [

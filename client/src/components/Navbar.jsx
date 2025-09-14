@@ -28,7 +28,7 @@ import header7 from "../assets/header7.jpg";
 
 
 
-const HEADER_IMAGES = [header1,header4,header6, header2, header3,header7];
+const HEADER_IMAGES = [header1,header4,header5,header6, header2, header3,header7];
 
 // mobile menu items
 const MOBILE_MENU = [

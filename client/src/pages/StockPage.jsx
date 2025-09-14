@@ -9,10 +9,10 @@ import "react-toastify/dist/ReactToastify.css";
 const DEFAULT_TYPES = ["all", "image", "video", "audio", "music"];
 const DEFAULT_CATEGORIES = [
   "all",
-  "posters",
-  "banners",
-  "flyers",
-  "wallpapers",
+  "nature",
+  "People",
+  "Sports",
+  "travel",
   "others",
 ];
 

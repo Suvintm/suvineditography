@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BadgeCheck, Download, Search, Loader2, X, Tag } from "lucide-react"; // icons
+import { BadgeCheck, Download, Search, Loader2, X, Tag, CircleArrowRightIcon } from "lucide-react"; // icons
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -78,35 +78,51 @@ export default function StockPage() {
     }
   };
 
-  const handleDownload = async (stock) => {
-    try {
-      setDownloading(true);
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/stocks/${stock._id}/download`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+ const handleDownload = async (stock) => {
+   try {
+     setDownloading(true);
 
-      const link = document.createElement("a");
-      link.href = stock.url;
-      link.download = stock.originalFileName || "download";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+     const res = await axios.get(
+       `${import.meta.env.VITE_API_URL}/api/stocks/${stock._id}/download`,
+       {
+         responseType: "blob",
+         headers: {
+           Authorization: `Bearer ${localStorage.getItem("token")}`,
+         },
+       }
+     );
 
-      toast.success("Download started!");
-      setSelectedStock(null);
-    } catch (err) {
-      console.error(err);
-      toast.error("Download failed");
-    } finally {
-      setDownloading(false);
-    }
-  };
+     // Get file type from server response
+     const contentType = res.headers["content-type"];
+     const extension = contentType?.split("/")[1] || ""; // e.g., image/png → png
+
+     // Pick filename: originalFileName > title > fallback
+     let filename = stock.originalFileName || stock.title || "download";
+     if (extension && !filename.includes(".")) {
+       filename = `${filename}.${extension}`;
+     }
+
+     // Create a download link
+     const blob = new Blob([res.data], { type: contentType });
+     const url = window.URL.createObjectURL(blob);
+     const a = document.createElement("a");
+     a.href = url;
+     a.download = filename;
+     document.body.appendChild(a);
+     a.click();
+     a.remove();
+     window.URL.revokeObjectURL(url);
+
+     toast.success("Download started!");
+     setSelectedStock(null);
+   } catch (err) {
+     console.error("Download error:", err);
+     toast.error("Download failed. Try again!");
+   } finally {
+     setDownloading(false);
+   }
+ };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-blue-50">
@@ -236,8 +252,6 @@ export default function StockPage() {
                       <span className="sm:text-sm text-[12px] font-medium flex items-center">
                         {stock.uploaderName}
                         {stock.uploaderName === "suvineditography" && (
-                          
-                           
                           <CheckBadgeIcon className="w-3 h-4 text-blue-500 ml-1" />
                         )}
                       </span>
@@ -271,6 +285,11 @@ export default function StockPage() {
                   >
                     {stock.status.toUpperCase()}
                   </span>
+                  <div className="flex items-center justify-between mt-1 mb-1">
+                    <span className="text-xs text-gray-500">
+                      Downloads: {stock.downloads || 0}
+                    </span>
+                  </div>
 
                   {/* Download btn */}
                   <button
@@ -315,20 +334,46 @@ export default function StockPage() {
             </p>
 
             <div className="bg-white border border-black  rounded-3xl p-3 mb-4">
-              <p className="text-xs text-gray-500 mb-1">Original File</p>
               <a
                 href={selectedStock.url}
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 text-sm break-all"
-              >
+              ></a>
+
+              <p className="text-xs text-gray-500 mb-1">Preview</p>
+
+              {selectedStock.type === "video" ? (
+                <video
+                  src={selectedStock.url}
+                  controls
+                  className="w-full rounded-md max-h-60"
+                />
+              ) : selectedStock.type === "audio" ||
+                selectedStock.type === "music" ? (
+                <div className="flex flex-col items-center bg-gray-100 rounded-md p-3">
+                  <span className="text-sm font-semibold mb-2">
+                    🎵 {selectedStock.title}
+                  </span>
+                  <audio controls src={selectedStock.url} className="w-full" />
+                </div>
+              ) : (
                 <img
                   src={selectedStock.url}
                   alt={selectedStock.title}
-                  className="mt-2 rounded-md"
+                  className="w-full rounded-md max-h-60 object-contain"
                 />
-              </a>
+              )}
             </div>
+            {selectedStock.type === "video" ? (
+              <p className="rounded-3xl text-[10px] bg-zinc-300 p-2 flex gap-2 mb-2">
+                {" "}
+                <CircleArrowRightIcon className="text-green-500 w-4 h-4" /> "If
+                Download Fails use three (:) dot menu on the video"
+              </p>
+            ) : (
+              ""
+            )}
 
             <div className="flex space-x-2">
               <button

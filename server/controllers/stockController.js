@@ -1,4 +1,6 @@
 // controllers/stockController.js
+// controllers/stockController.js
+import axios from "axios"; // <-- add this
 import Stock from "../model/stockModel.js";
 import User from "../model/userModel.js";
 import slugify from "slugify";
@@ -260,6 +262,9 @@ export const deleteStock = async (req, res) => {
   }
 };
 
+
+
+
 // increment download count (call when user downloads)
 export const incrementDownload = async (req, res) => {
   try {
@@ -278,3 +283,38 @@ export const incrementDownload = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+// controllers/stockController.js
+ 
+
+ 
+// controllers/stockController.js
+export const downloadStock = async (req, res) => {
+  try {
+    const stock = await Stock.findById(req.params.id);
+    if (!stock) return res.status(404).json({ message: "Stock not found" });
+
+    // Increment downloads
+    stock.downloads = (stock.downloads || 0) + 1;
+    await stock.save();
+
+    // Fetch file from Cloudinary or direct URL
+    const response = await axios.get(stock.url, { responseType: "stream" });
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${stock.originalFileName || stock.title || "download"}"`
+    );
+    res.setHeader("Content-Type", response.headers["content-type"]);
+
+    response.data.pipe(res);
+  } catch (error) {
+    console.error("Download error:", error.message);
+    res.status(500).json({
+      message: "Download failed",
+      error: error.message,
+    });
+  }
+};
+
+

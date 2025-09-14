@@ -9,6 +9,7 @@ import {
   updateStock,
   deleteStock,
   incrementDownload,
+  downloadStock,
 } from "../controllers/stockController.js";
 
 const router = express.Router();
@@ -37,5 +38,7 @@ router.delete("/:id", authMiddleware, deleteStock);
 
 // Increment download
 router.post("/:id/download", incrementDownload);
+router.get("/:id/download", downloadStock);
+
 
 export default router;

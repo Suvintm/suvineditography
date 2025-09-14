@@ -17,7 +17,7 @@ export default function GoToStudioCard() {
       />
       <img
         onClick={() => navigate("/studio")}
-        className="absolute cursor-pointer animate-bounce sm:hidden flex z-10 left-0 top-298 w-50 h-35"
+        className="absolute cursor-pointer animate-bounce sm:hidden flex z-10 left-0 top-330 w-50 h-35"
         src={man}
         alt="man"
       />
@@ -29,7 +29,7 @@ export default function GoToStudioCard() {
       > <Gift/> Free</h1>
        <h1
         onClick={() => navigate("/studio")}
-        className="absolute cursor-pointer  sm:hidden  flex z-50 bg-green-500 left-65 top-245 px-4 sm:px-8 text-white sm:text-[20px] text-[15px] font-bold p-2 gap-2 rounded-2xl"
+        className="absolute cursor-pointer  sm:hidden  flex z-50 bg-green-500 left-65 top-280 px-4 sm:px-8 text-white sm:text-[20px] text-[15px] font-bold p-2 gap-2 rounded-2xl"
         src={man}
         alt="man"
       > <Gift className="w-5 h-5" /> Free</h1>

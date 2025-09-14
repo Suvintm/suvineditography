@@ -1,14 +1,16 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap');
 
-.logo-text {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  /* adjust size and letter-spacing to match the styling */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Josefin+Sans:wght@100..700&family=Outfit:wght@100..900&family=Poppins:wght@400;600&display=swap');
+
+/* Define font families with Tailwind's @theme */
+@theme {
+  --font-poppins: "Poppins", sans-serif;
+  --font-josefin: "Josefin Sans", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-dm: "DM Sans", sans-serif;
 }
- 
+
+/* Global font */
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-dm);
 }

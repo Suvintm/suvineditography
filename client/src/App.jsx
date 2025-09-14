@@ -16,6 +16,10 @@ import StockPage from "./pages/StockPage.jsx";// <-- new
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./pages/toast.css";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
+
 
 const App = () => {
   return (

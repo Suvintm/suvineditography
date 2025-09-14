@@ -1,80 +1,188 @@
+import React, { useState, useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
-import React, { useState, useContext } from "react";
-
-import { IoMdClose,IoIosPricetags, IoMdMenu, IoIosOptions } from "react-icons/io";
-import {RiHeartFill, RiHome7Line, RiHomeSmileLine, RiMenuFold2Fill, RiMenuUnfold2Fill, RiMoneyCnyBoxFill, RiProfileFill, RiProfileLine} from "react-icons/ri"
+import { IoMdClose, IoIosPricetags, IoIosOptions } from "react-icons/io";
+import { RiHeartFill, RiHome7Line, RiProfileFill } from "react-icons/ri";
+import {
+  Gift,
+  Gem,
+  WalletIcon,
+  IndianRupee,
+  InfoIcon,
+  LogOutIcon,
+  LucideUserCheck2,
+  Boxes,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
+import { AppContext } from "../context/AppContext";
 
-import { AppContext } from "../context/AppContext"; // Adjust the path
-import { Coins, CoinsIcon, Gem, Gift, IndianRupee, InfoIcon, LogOutIcon, LucideUserCheck2, MenuIcon, MenuSquareIcon, UserPen, WalletIcon } from "lucide-react";
+// Header background images
+import header1 from "../assets/header1.jpg";
+import header2 from "../assets/header2.jpg";
+import header3 from "../assets/header3.jpg";
+
+const HEADER_IMAGES = [header1, header2, header3];
+
+// mobile menu items
+const MOBILE_MENU = [
+  {
+    name: "Studio",
+    icon: <RiHome7Line className="w-5 h-5" />,
+    action: "scroll",
+    targetId: "studio-go",
+  },
+  { name: "Stocks", icon: <Boxes className="w-5 h-5" />, action: "navigate" },
+  {
+    name: "FreeTools",
+    icon: <Gift className="w-5 h-5" />,
+    action: "scroll",
+    targetId: "freetools-go",
+  },
+  {
+    name: "ProTools",
+    icon: <Gem className="w-5 h-5" />,
+    action: "scroll",
+    targetId: "protools-go",
+  },
+  {
+    name: "Pricing",
+    icon: <IoIosPricetags className="w-5 h-5" />,
+    action: "scroll",
+    targetId: "pricing-go",
+  },
+];
 
 const Navbar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [currentBg, setCurrentBg] = useState(0);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   const Navigate = useNavigate();
   const { user, credits } = useContext(AppContext);
 
-  const handleScrollToTools = () => {
-    const element = document.getElementById("studio-go");
+  // Cycle background images every 4s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % HEADER_IMAGES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Reusable scroll function
+  const handleScrollTo = (id) => {
+    const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
   return (
-    <nav className="bg-[#fafafa] absolute shadow-md shadow-black px-4 py-3 flex justify-between items-center w-full rounded-b-3xl z-10 ">
-      <div className="text-xl font-bold text-blue-600 flex gap-2 items-center justify-center  ">
-        <img className="w-10 sm:w-20" src={logo} alt="" />
-        <h1 className=" logoname text-black text-[15px] sm:text-3xl">
-          SUVINAI
-        </h1>
+    <div className="relative w-full">
+      {/* Background slideshow */}
+      <div className="absolute inset-0 sm:h-80 h-40 overflow-hidden border-2">
+        {HEADER_IMAGES.map((img, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+              index === currentBg
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-105"
+            }`}
+            style={{
+              backgroundImage: `url(${img})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          />
+        ))}
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/50 backdrop-brightness-100"></div>
       </div>
-      {/* menu bar */}
-      <div className="hidden sm:block">
+
+      {/* Navbar content */}
+      <nav className="relative px-4 sm:px-20 py-3 pt-4 flex justify-between items-center w-full z-10 text-white">
+        <div className="flex sm:gap-4 gap-2 items-center">
+          <img
+            className="w-10 sm:w-16 border-2 border-white rounded-full"
+            src={logo}
+            alt="logo"
+          />
+          <h1 className="font-josefin text-3xl logoname text-lg sm:text-3xl font-bold">
+            SUVINAI
+          </h1>
+        </div>
+
+        {/* Right section */}
+        <div className="flex items-center sm:gap-6 sm:pr-20">
+          <Link
+            to="/buy-credit"
+            className="flex gap-1 sm:gap-2 text-[12px] bg-black-400/20 border items-center justify-center mr-2 border-white/50 text-white px-2 py-2 rounded-full font-medium"
+          >
+            <WalletIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Credits: {credits}
+          </Link>
+          <button onClick={toggleSidebar} className="text-white text-2xl">
+            <IoIosOptions />
+          </button>
+        </div>
+      </nav>
+
+      {/* Desktop menu */}
+      <div className="hidden relative justify-center sm:flex item-center">
         <ul className="flex flex-row gap-6 font-bold">
           <li
-            onClick={handleScrollToTools}
-            className="flex gap-2 hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl p-2 flex-row"
+            onClick={() => handleScrollTo("studio-go")}
+            className="flex gap-2 px-3 py-2 rounded-full bg-white/90 hover:bg-white/40 cursor-pointer"
           >
-            <RiHome7Line className="w-8 h-6" />
+            <RiHome7Line className="w-6 h-6" />
             Studio
           </li>
-          <li className=" flex gap-2 hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl p-2">
-            <Gift />
-            FreeTools
+          <li
+            onClick={() => handleScrollTo("freetools-go")}
+            className="flex gap-2 px-3 py-2 rounded-full bg-white/90 hover:bg-white/70 cursor-pointer"
+          >
+            <Gift /> FreeTools
           </li>
-          <li className="flex gap-2 hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl p-2">
+          <li
+            onClick={() => handleScrollTo("protools-go")}
+            className="flex gap-2 px-3 py-2 rounded-full bg-white/90 hover:bg-white/70 cursor-pointer"
+          >
             <Gem /> ProTools
           </li>
-          <li className="hover:text-white hover:bg-blue-800 cursor-pointer bg-zinc-200  rounded-2xl flex gap-2 p-2">
-            <IoIosPricetags className="w-6 h-6" />
-            <p>Pricing</p>
+          <li
+            onClick={() => handleScrollTo("pricing-go")}
+            className="flex gap-2 px-3 py-2 rounded-full bg-white/90 hover:bg-white/70 cursor-pointer"
+          >
+            <IoIosPricetags className="w-6 h-6" /> Pricing
+          </li>
+          <li
+            onClick={() => Navigate("/stocks")}
+            className="flex gap-2 px-3 py-2 rounded-full bg-white/90 hover:bg-white/70 cursor-pointer"
+          >
+            <Boxes className="w-6 h-6" /> Stocks
           </li>
         </ul>
       </div>
 
-      {/* Credit Box & Profile */}
-      <div className="flex items-center sm:gap-6 sm:pr-20 space-x-4">
-        {/* Credit Box */}
-        <Link
-          to="/buy-credit"
-          className="flex gap-1 sm:gap-2  bg-black border-2  text-white px-3 py-1 sm:px-4 sm:py-2 rounded-3xl items-center-safe sm:text-[20px] text-[12px] font-medium"
-        >
-          <WalletIcon className="w-4 h-4 sm:w-6 sm:h-6" />{" "}
-          <span className="hidden sm:block">Credits</span>: {credits}
-        </Link>
-
-        {/* Profile Icon */}
-        <button
-          onClick={toggleSidebar}
-          className="text-black text:[60px] sm:text-6xl "
-        >
-          <IoIosOptions className="w-6 h-6 sm:w-8 sm:h-8" />
-          {/* <IoMdMenu /> */}
-        </button>
+      {/* ✅ Mobile scroll menu */}
+      <div className="relative sm:hidden justify-center items flex px-2 pt-6 pb-2 z-10">
+        <ul className="flex space-x-2 overflow-x-auto">
+          {MOBILE_MENU.map((item, i) => (
+            <li
+              key={i}
+              onClick={
+                item.action === "scroll"
+                  ? () => handleScrollTo(item.targetId)
+                  : item.action === "navigate"
+                  ? () => Navigate("/stocks")
+                  : null
+              }
+              className="flex items-center gap-2 px-2 text-[10px] sm:px-3 py-2 rounded-full bg-black border border-white/30 text-white text-sm font-semibold whitespace-nowrap hover:bg-white/40 cursor-pointer"
+            >
+              {item.icon}
+              {item.name}
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* Sidebar */}
@@ -84,7 +192,6 @@ const Navbar = () => {
         } z-50 p-4`}
       >
         {/* Close Button */}
-
         <div className="flex justify-end">
           <button
             onClick={toggleSidebar}
@@ -94,14 +201,13 @@ const Navbar = () => {
           </button>
         </div>
         <div>
-          <h1 className="font-bold text-center mx-8 p-1  bg-zinc-300 sm:mx-15 rounded-2xl sm:p-2 sm:text-2xl">
+          <h1 className="font-bold text-center mx-8 p-1 bg-blue-100 sm:mx-15 rounded-2xl sm:p-2 sm:text-2xl">
             Profile & Menu{" "}
           </h1>
         </div>
 
         {/* Profile Content */}
-        {/* Profile Content */}
-        <div className="flex flex-col border-white border-1 rounded-3xl shadow-2xl text-black shadow-black items-center mt-6 p-4">
+        <div className="flex flex-col border-white border-1 rounded-3xl shadow-2xl  shadow-blue-300 text-black  items-center mt-6 p-4">
           <div className="flex items-center gap-2 sm:gap-6 w-full">
             <div className="rounded-full border-2 border-zinc-500 overflow-hidden max-w-16 max-h-16 sm:max-w-20 sm:max-h-20 items-center-safe text-center">
               <img
@@ -142,24 +248,24 @@ const Navbar = () => {
         <div className="mt-8 flex flex-col items-center justify-center-safe space-y-4 px-4">
           <Link
             to="/pricing"
-            className="flex justify-center bg-black min-w-40  sm:min-w-60 p-1 sm:p-2  rounded-3xl shadow-2xl  shadow-black font-semibold  text-center text-white hover:text-black hover:bg-white hover:border-1 hover:border-black sm:gap-2 gap-1 items-center-safe"
+            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
-            <IndianRupee className="w-4 h-4  sm:w-5 sm:h-5" /> Pricing
+            <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5" /> Pricing
           </Link>
           <Link
             to="/about"
-            className="flex justify-center bg-black min-w-40  sm:min-w-60 p-1 sm:p-2  rounded-3xl shadow-2xl  shadow-black font-semibold  text-center text-white hover:text-black hover:bg-white hover:border-1 hover:border-black sm:gap-2 gap-1 items-center-safe"
+            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl  font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
-            <InfoIcon className="w-4 h-4  sm:w-5 sm:h-5" /> About
+            <InfoIcon className="w-4 h-4 sm:w-5 sm:h-5" /> About
           </Link>
           <button
             onClick={() => {
               Navigate("/login");
               console.log("Logged out");
             }}
-            className="flex justify-center bg-black min-w-40  sm:min-w-60 p-1 sm:p-2  rounded-3xl shadow-2xl  shadow-black font-semibold  text-center text-white hover:text-black hover:bg-white hover:border-1 hover:border-black sm:gap-2 gap-1 items-center-safe"
+            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl   font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
-            <LogOutIcon className="w-4 h-4  sm:w-5 sm:h-5" /> Logout
+            <LogOutIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Logout
           </button>
         </div>
       </div>
@@ -171,7 +277,7 @@ const Navbar = () => {
           className="fixed inset-0 bg-black opacity-30 z-40"
         ></div>
       )}
-    </nav>
+    </div>
   );
 };
 

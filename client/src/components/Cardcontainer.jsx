@@ -7,7 +7,7 @@ import { CloudLightning } from "lucide-react";
 const Cardcontainer = () => {
   return (
     <section
-      id="tool-container"
+      id="protools-go"
       className="relative py-10 px-4 sm:px-8 rounded-3xl  bg-gradient-to-b from-black via-yellow-900 to-black "
     >
       <div className="border-2 border-zinc-400 pb-4 sm:p-8 rounded-3xl">
@@ -22,7 +22,10 @@ const Cardcontainer = () => {
 
         <div className="w-full text-center items-center-safe justify-center flex mt-6 ">
           <h2 className=" flex gap-2 items-center-safe text-center justify-center text-2xl sm:text-4xl mt-9 sm:mt-4 font-bold text-white mb-8">
-            <CloudLightning className="text-yellow-400 sm:w-8 sm:h-8" /> <span className="font-bold text-orange-400 text-3xl sm:text-5xl" >Pro</span>{" "}
+            <CloudLightning className="text-yellow-400 sm:w-8 sm:h-8" />{" "}
+            <span className="font-bold text-orange-400 text-3xl sm:text-5xl">
+              Pro
+            </span>{" "}
             Editing Tools
           </h2>
         </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Outlet, useLocation, Navigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, Navigate, Link } from "react-router-dom";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid"; // badge icon
 import logo from "../assets/logo.png";
 import unsplashLogo from "../assets/unplash.png";
@@ -66,7 +66,8 @@ export default function StockMainPage() {
 
         {/* Nav bar */}
         <nav className="relative px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
+            
             <img
               src={logo}
               alt="logo"
@@ -75,7 +76,7 @@ export default function StockMainPage() {
             <span className="font-bold text-lg text-white">
               SuvinEditography
             </span>
-          </div>
+          </Link>
         </nav>
 
         {/* "Choose your source" text */}

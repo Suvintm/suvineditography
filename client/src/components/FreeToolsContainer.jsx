@@ -28,7 +28,10 @@ const freeTools = [
 
 const FreeToolsContainer = () => {
   return (
-    <section className="relative py-10 px-4 sm:px-8 rounded-3xl bg-gradient-to-b from-black via-green-900 to-black mb-5">
+    <section
+      id="freetools-go"
+      className="  relative py-10 px-4 sm:px-8 rounded-3xl bg-gradient-to-b from-black via-green-900 to-black mb-5"
+    >
       <div className="border-2 border-zinc-400 pb-4 sm:p-8 rounded-3xl">
         {/* Free Tools Label */}
         <div className="absolute top-2 left-8 sm:left-15 sm:border-8  bg-black border-4 border-zinc-500  text-white pl-3 sm:pl-4 py-2 w-[180px] sm:w-[200px] rounded-3xl shadow-lg">
@@ -41,8 +44,8 @@ const FreeToolsContainer = () => {
         {/* Heading */}
         <div className="w-full text-center items-center-safe justify-center flex mt-2 ">
           <h2 className=" flex gap-2 items-center-safe text-center text-2xl sm:text-4xl mt-9 sm:mt-4 font-bold text-white mb-8">
-            <RiGiftFill className="text-green-500" /> <span className="text-green-400">Free</span> Editing
-            Tools
+            <RiGiftFill className="text-green-500" />{" "}
+            <span className="text-green-400">Free</span> Editing Tools
           </h2>
         </div>
 

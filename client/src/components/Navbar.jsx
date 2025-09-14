@@ -19,8 +19,16 @@ import { AppContext } from "../context/AppContext";
 import header1 from "../assets/header1.jpg";
 import header2 from "../assets/header2.jpg";
 import header3 from "../assets/header3.jpg";
+import header4 from "../assets/header4.jpg";
+import header5 from "../assets/header5.jpg";
+import header6 from "../assets/header6.jpg";
+import header7 from "../assets/header7.jpg";
 
-const HEADER_IMAGES = [header1, header2, header3];
+
+
+
+
+const HEADER_IMAGES = [header1,header4,header6, header2, header3,header7];
 
 // mobile menu items
 const MOBILE_MENU = [
@@ -79,7 +87,7 @@ const Navbar = () => {
   return (
     <div className="relative w-full">
       {/* Background slideshow */}
-      <div className="absolute inset-0 sm:h-80 h-40 overflow-hidden border-2">
+      <div className="absolute inset-0 sm:h-80 h-40 overflow-hidden ">
         {HEADER_IMAGES.map((img, index) => (
           <div
             key={index}
@@ -101,9 +109,9 @@ const Navbar = () => {
 
       {/* Navbar content */}
       <nav className="relative px-4 sm:px-20 py-3 pt-4 flex justify-between items-center w-full z-10 text-white">
-        <div className="flex sm:gap-4 gap-2 items-center">
+        <div className="flex sm:gap-4 gap-3 items-center">
           <img
-            className="w-10 sm:w-16 border-2 border-white rounded-full"
+            className="w-10 sm:w-16 border-1 border-white rounded-full"
             src={logo}
             alt="logo"
           />
@@ -165,7 +173,7 @@ const Navbar = () => {
 
       {/* ✅ Mobile scroll menu */}
       <div className="relative sm:hidden justify-center items flex px-2 pt-6 pb-2 z-10">
-        <ul className="flex space-x-2 overflow-x-auto">
+        <ul className="flex space-x-2 overflow-x-auto  scrollbar-hidden">
           {MOBILE_MENU.map((item, i) => (
             <li
               key={i}

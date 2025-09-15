@@ -24,11 +24,15 @@ import header5 from "../assets/header5.jpg";
 import header6 from "../assets/header6.jpg";
 import header7 from "../assets/header7.jpg";
 
-
-
-
-
-const HEADER_IMAGES = [header1,header4,header5,header6, header2, header3,header7];
+const HEADER_IMAGES = [
+  header1,
+  header4,
+  header5,
+  header6,
+  header2,
+  header3,
+  header7,
+];
 
 // mobile menu items
 const MOBILE_MENU = [
@@ -111,13 +115,13 @@ const Navbar = () => {
       <nav className="relative px-4 sm:px-20 py-3 pt-4 flex justify-between items-center w-full z-10 text-white">
         <div className="flex sm:gap-4 gap-3 items-center">
           <img
-            className="w-10 sm:w-16 border-1 border-white rounded-full"
             src={logo}
             alt="logo"
+            className="w-8 h-8 border-2 border-white rounded-3xl"
           />
-          <h1 className="font-josefin text-3xl logoname text-lg sm:text-3xl font-bold">
-            SUVINAI
-          </h1>
+          <span className="font-bold text-[14px] text-white">
+            SuvinEditography
+          </span>
         </div>
 
         {/* Right section */}

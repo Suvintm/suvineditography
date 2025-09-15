@@ -2,7 +2,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { BadgeCheck, Download, Search, Loader2, X, Tag, CircleArrowRightIcon } from "lucide-react"; // icons
+import {
+  BadgeCheck,
+  Download,
+  Search,
+  Loader2,
+  X,
+  Tag,
+  CircleArrowRightIcon,
+} from "lucide-react"; // icons
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -78,51 +86,50 @@ export default function StockPage() {
     }
   };
 
- const handleDownload = async (stock) => {
-   try {
-     setDownloading(true);
+  const handleDownload = async (stock) => {
+    try {
+      setDownloading(true);
 
-     const res = await axios.get(
-       `${import.meta.env.VITE_API_URL}/api/stocks/${stock._id}/download`,
-       {
-         responseType: "blob",
-         headers: {
-           Authorization: `Bearer ${localStorage.getItem("token")}`,
-         },
-       }
-     );
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/stocks/${stock._id}/download`,
+        {
+          responseType: "blob",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-     // Get file type from server response
-     const contentType = res.headers["content-type"];
-     const extension = contentType?.split("/")[1] || ""; // e.g., image/png → png
+      // Get file type from server response
+      const contentType = res.headers["content-type"];
+      const extension = contentType?.split("/")[1] || ""; // e.g., image/png → png
 
-     // Pick filename: originalFileName > title > fallback
-     let filename = stock.originalFileName || stock.title || "download";
-     if (extension && !filename.includes(".")) {
-       filename = `${filename}.${extension}`;
-     }
+      // Pick filename: originalFileName > title > fallback
+      let filename = stock.originalFileName || stock.title || "download";
+      if (extension && !filename.includes(".")) {
+        filename = `${filename}.${extension}`;
+      }
 
-     // Create a download link
-     const blob = new Blob([res.data], { type: contentType });
-     const url = window.URL.createObjectURL(blob);
-     const a = document.createElement("a");
-     a.href = url;
-     a.download = filename;
-     document.body.appendChild(a);
-     a.click();
-     a.remove();
-     window.URL.revokeObjectURL(url);
+      // Create a download link
+      const blob = new Blob([res.data], { type: contentType });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
 
-     toast.success("Download started!");
-     setSelectedStock(null);
-   } catch (err) {
-     console.error("Download error:", err);
-     toast.error("Download failed. Try again!");
-   } finally {
-     setDownloading(false);
-   }
- };
-
+      toast.success("Download started!");
+      setSelectedStock(null);
+    } catch (err) {
+      console.error("Download error:", err);
+      toast.error("Download failed. Try again!");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-blue-50">
@@ -221,7 +228,7 @@ export default function StockPage() {
               >
                 {/* Preview */}
                 {/* Preview */}
-                <div className="w-full bg-black flex justify-center items-center">
+                <div className="relative w-full bg-black flex justify-center items-center">
                   {stock.type === "video" ? (
                     <video
                       src={stock.url}
@@ -237,6 +244,14 @@ export default function StockPage() {
                       className="w-full max-h-80 object-contain"
                     />
                   )}
+                  {/* ✅ Premium Watermark
+                  {stock.status === "free" && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-yellow-400/70 text-lg sm:text-2xl font-bold bg-black/40 px-3 py-1 rounded-lg">
+                        Premium
+                      </span>
+                    </div>
+                  )} */}
                 </div>
 
                 <div className="p-3 flex flex-col flex-1">

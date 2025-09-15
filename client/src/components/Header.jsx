@@ -26,8 +26,6 @@ import img5 from "../assets/header5.jpg";
 import img6 from "../assets/header6.jpg";
 import img7 from "../assets/header7.jpg";
 
-
-
 // ✅ Array with image + text
 const carouselSlides = [
   { image: img5, text: "Photography Profession" },
@@ -71,7 +69,8 @@ const Header = () => {
           onClick={() => navigate("/stocks")}
           className="bg-white rounded-3xl cursor-pointer sm:mt-4 gap-2 sm:w-100 w-60 flex items-center text-black mt-2 text-center p-2 justify-start"
         >
-          <Boxes className="w-4 h-4 sm:w-6 sm:h-6" /> <span className="text-[12px]" >Stocks</span>
+          <Boxes className="w-4 h-4 sm:w-6 sm:h-6" />{" "}
+          <span className="text-[12px]">Stocks</span>
           <SearchIcon className="w-4 h-4 sm:w-6 sm:h-6" />
           <p className="text-zinc-500 text-[12px] sm:text-[20px]">
             Search and get your..
@@ -94,7 +93,7 @@ const Header = () => {
         </div>
 
         {/* Right: Swiper Carousel */}
-        <div className="sm:m-20 sm:absolute sm:w-72 sm:h-72 sm:items-center h-40 shadow-2xl shadow-black rounded-2xl mt-8 mr-8 text-center sm:right-30 overflow-hidden relative border-2 border-white/40 flex flex-col">
+        <div className="sm:m-20 sm:absolute sm:w-72 sm:h-72 sm:items-center h-40 shadow-2xl shadow-black rounded-2xl mt-8 mr-8 text-center sm:right-30 overflow-hidden relative border-2 border-white/10 flex flex-col">
           <Swiper
             modules={[Autoplay]}
             autoplay={{ delay: 2500, disableOnInteraction: false }}

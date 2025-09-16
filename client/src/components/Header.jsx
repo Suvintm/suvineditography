@@ -62,7 +62,7 @@ const Header = () => {
   };
 
   return (
-    <div className="pt-10 h-100 bg-gradient-to-b from-black via-indigo-900 to-black w-full rounded-[12px] sm:pt-45 sm:h-140 items-center-safe justify-center-safe text-center">
+    <div className="pt-10 h-100 bg-gradient-to-b from-black via-blue-200 to-black w-full rounded-[12px] sm:pt-45 sm:h-140 items-center-safe justify-center-safe text-center">
       {/* Search Bar */}
       <div className="w-ful items-center flex justify-center mb-2">
         <div
@@ -82,18 +82,18 @@ const Header = () => {
       <div className="flex flex-row justify-between gap-2 sm:gap-4">
         {/* Left: Text */}
         <div className="text-center p-2 sm:p-6 w-1/2 sm:w-1/2 flex flex-col justify-center">
-          <h1 className="font-josefin text-3xl text-[20px] pl-2 sm:text-6xl font-extrabold text-white">
+          <h1 className="font-josefin text-3xl text-[20px] pl-2 sm:text-6xl font-extrabold text-black">
             Suvin
             <br />
             Editography
           </h1>
-          <p className="text-zinc-400 text-[15px] sm:text-3xl">
+          <p className="text-zinc-900 text-[15px] sm:text-3xl">
             Creative editing at your fingertips.
           </p>
         </div>
 
         {/* Right: Swiper Carousel */}
-        <div className="sm:m-20 sm:absolute sm:w-72 sm:h-72 sm:items-center h-40 shadow-2xl shadow-black rounded-2xl mt-8 mr-8 text-center sm:right-30 overflow-hidden relative border-2 border-white/10 flex flex-col">
+        <div className="sm:m-20 sm:absolute sm:w-72 sm:h-72 sm:items-center h-40 shadow-2xl shadow-black rounded-2xl mt-8 mr-8 text-center sm:right-30 overflow-hidden relative  flex flex-col">
           <Swiper
             modules={[Autoplay]}
             autoplay={{ delay: 2500, disableOnInteraction: false }}
@@ -113,7 +113,7 @@ const Header = () => {
           </Swiper>
 
           {/* ✅ Text outside image */}
-          <p className=" mt-3 text-white text-sm sm:text-lg pb-2">
+          <p className=" mt-3 text-black font-bold text-sm sm:text-lg pb-2">
             {carouselSlides[activeIndex].text}
           </p>
         </div>
@@ -123,9 +123,9 @@ const Header = () => {
       <div className="text-center p-10 mt-1 items-center-safe text-white">
         <button
           onClick={handleScrollToTools}
-          className="flex sm:ml-195 ml-20 items-center-safe gap-2 bg-gradient-to-r cursor-pointer from-black via-indigo-600 to-black sm:text-[20px] border-1 border-zinc-600 shadow-4xl shadow-black font-semibold px-2 py-2 sm:px-12 sm:py-4 rounded-3xl text-[15px]"
+          className="flex sm:ml-195 ml-20 items-center-safe gap-2 bg-gradient-to-r cursor-pointer from-black via-black to-black sm:text-[20px] border-1 border-zinc-600 shadow-4xl shadow-black font-semibold px-2 py-2 sm:px-12 sm:py-4 rounded-3xl text-[15px]"
         >
-          <ArrowBigDownDashIcon className="animate-bounce" /> Get Started
+          <ArrowBigDownDashIcon className="animate-bounce w-4 h-4" /> Get Started
         </button>
         <p className="mb-4 text-zinc-400 sm:mx-100 text-[6px] sm:text-2xl mt-4">
           Welcome to SuvinEditography — your one-stop platform for seamless,

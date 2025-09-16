@@ -1,6 +1,7 @@
 import userModel from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 const registerUser = async (req, res) => {
   try {
@@ -110,5 +111,59 @@ const userCredit = async (req, res) => {
     toast.error(error?.response?.data?.message || "Something went wrong.");
   }
 };
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
 
-export { registerUser, loginUser ,userCredit};
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
+    // Send Email
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // or your email provider
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Password Reset",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. Link valid for 15 mins.</p>`,
+    });
+
+    res.json({ success: true, message: "Password reset link sent." });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await userModel.findById(decoded.id);
+    if (!user) return res.json({ success: false, message: "User not found" });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    await user.save();
+
+    res.json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: "Invalid or expired token" });
+  }
+};
+
+
+
+export { registerUser, loginUser ,userCredit,forgotPassword,resetPassword};

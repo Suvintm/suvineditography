@@ -108,6 +108,12 @@ function Login() {
             </button>
           </form>
           {/* Footer */}
+          <p
+            className="mt-3 text-xs sm:text-sm text-indigo-600 font-semibold cursor-pointer hover:underline"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot Password?
+          </p>
           <p className="mt-5 sm:mt-6 text-xs sm:text-sm text-gray-700">
             New user?{" "}
             <span

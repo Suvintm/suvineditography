@@ -12,6 +12,9 @@ import StockMainPage from "./pages/StockMainPage.jsx";
 import UnsplashStock from "./pages/UnsplashStock.jsx"; 
 import PixabayStock from "./pages/PixabayStock.jsx";
 import StockPage from "./pages/StockPage.jsx";// <-- new
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,6 +32,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/background-remover" element={<BgRemover />} />
         <Route path="/svn-bg-remover" element={<BgOwnModel />} />
         {/* Studio Routes */}

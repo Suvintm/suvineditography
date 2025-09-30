@@ -50,7 +50,7 @@ function Signup() {
   return (
     <>
       <ToastContainer position="top-right" autoClose={4000} />
-      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-black via-indigo-500 to-black px-4">
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-black  to-black px-4">
         <div
           className="signup-box bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl 
           p-6 sm:p-10 max-w-md w-full text-center 

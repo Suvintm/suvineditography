@@ -7,7 +7,7 @@ export default function ProtectedRoute({ children }) {
 
   if (loadingUser) {
     // Show a loading spinner or nothing while checking auth
-    return <div>Loading...</div>;
+    return <div className="bg-black text-2xl items-center justify-center font-bold animate-pulse min-h-screen w-full text-white text-center flex">Loading...</div>;
   }
 
   if (!user || !token) {

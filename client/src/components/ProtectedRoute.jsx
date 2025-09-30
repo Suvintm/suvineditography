@@ -11,10 +11,8 @@ export default function ProtectedRoute({ children }) {
     return (
       <div className="bg-black text-2xl items-center justify-center font-bold   min-h-screen w-full text-white text-center flex">
         <div className="flex-row gap-1 text-center">
-          <span className="animate-pulse">
-            Loading..
-            <SmileIcon />
-          </span>
+          <span className="animate-pulse">Loading..</span>
+          <SmileIcon className="animate-pulse" />
         </div>
       </div>
     );

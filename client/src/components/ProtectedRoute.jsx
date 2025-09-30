@@ -1,13 +1,18 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import { Navigate } from "react-router-dom";
+import { SmileIcon } from "lucide-react";
 
 export default function ProtectedRoute({ children }) {
   const { user, token, loadingUser } = useContext(AppContext);
 
   if (loadingUser) {
     // Show a loading spinner or nothing while checking auth
-    return <div className="bg-black text-2xl items-center justify-center font-bold animate-pulse min-h-screen w-full text-white text-center flex">Loading...</div>;
+    return (
+      <div className="bg-black text-2xl items-center justify-center font-bold   min-h-screen w-full text-white text-center flex">
+        <span className="animate-pulse">Loading..<SmileIcon /></span>.
+      </div>
+    );
   }
 
   if (!user || !token) {

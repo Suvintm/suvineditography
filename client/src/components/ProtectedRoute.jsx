@@ -10,7 +10,12 @@ export default function ProtectedRoute({ children }) {
     // Show a loading spinner or nothing while checking auth
     return (
       <div className="bg-black text-2xl items-center justify-center font-bold   min-h-screen w-full text-white text-center flex">
-        <span className="animate-pulse">Loading..<SmileIcon /></span>.
+        <div className="flex-col gap-1 text-center">
+          <span className="animate-pulse">
+            Loading..
+            <SmileIcon />
+          </span>
+        </div>
       </div>
     );
   }

@@ -21,7 +21,7 @@ import "./pages/toast.css";
 import "@fontsource/poppins/400.css";
 import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const App = () => {
   return (
@@ -120,5 +120,5 @@ const App = () => {
     </div>
   );
 };
- 
+
 export default App;

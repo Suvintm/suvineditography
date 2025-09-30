@@ -28,7 +28,7 @@ const App = () => {
     <div className="min-h-screen">
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Home />} />
+
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -37,6 +37,14 @@ const App = () => {
         <Route path="/svn-bg-remover" element={<BgOwnModel />} />
 
         {/* 🔒 Protected Studio Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/studio"
           element={
@@ -62,11 +70,39 @@ const App = () => {
           }
         />
 
-        {/* Stock Routes (public browsing allowed) */}
-        <Route path="/stocks" element={<StockMainPage />}>
-          <Route path="suvineditography" element={<StockPage />} />
-          <Route path="unsplash" element={<UnsplashStock />} />
-          <Route path="pixabay" element={<PixabayStock />} />
+        {/* Stock Routes (only private browsing allowed) */}
+        <Route
+          path="/stocks"
+          element={
+            <ProtectedRoute>
+              <StockMainPage />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="suvineditography"
+            element={
+              <ProtectedRoute>
+                <StockPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="unsplash"
+            element={
+              <ProtectedRoute>
+                <UnsplashStock />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="pixabay"
+            element={
+              <ProtectedRoute>
+                <PixabayStock />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* 🔒 Protected Upload Page */}

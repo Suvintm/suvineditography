@@ -262,6 +262,40 @@ export default function UploadStocks() {
             onChange={(e) => setFile(e.target.files[0])}
             required
           />
+
+          {/* ✅ File Preview */}
+          {file && (
+            <div className="mt-4">
+              <p className="font-semibold mb-2">Preview:</p>
+              {file.type.startsWith("image/") && (
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt="preview"
+                  className="max-w-xs rounded border"
+                />
+              )}
+              {file.type.startsWith("video/") && (
+                <video
+                  controls
+                  className="max-w-xs rounded border"
+                  src={URL.createObjectURL(file)}
+                />
+              )}
+              {file.type.startsWith("audio/") && (
+                <audio
+                  controls
+                  className="w-full"
+                  src={URL.createObjectURL(file)}
+                />
+              )}
+              {/* For other file types */}
+              {!file.type.startsWith("image/") &&
+                !file.type.startsWith("video/") &&
+                !file.type.startsWith("audio/") && (
+                  <p className="text-gray-600">File selected: {file.name}</p>
+                )}
+            </div>
+          )}
         </div>
 
         <button

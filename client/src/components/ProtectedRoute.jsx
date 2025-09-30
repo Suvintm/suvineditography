@@ -3,13 +3,16 @@ import { AppContext } from "../context/AppContext";
 import { Navigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
-  const { user, token } = useContext(AppContext);
+  const { user, token, loadingUser } = useContext(AppContext);
 
-  // If not logged in, redirect to login
+  if (loadingUser) {
+    // Show a loading spinner or nothing while checking auth
+    return <div>Loading...</div>;
+  }
+
   if (!user || !token) {
     return <Navigate to="/login" replace />;
   }
 
-  // If logged in, render the children (the protected page)
   return children;
 }

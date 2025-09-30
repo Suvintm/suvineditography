@@ -16,9 +16,12 @@ const AppContextProvider = ({ children }) => {
   const [activesourceVideo, setActiveSourceVideo] = useState("All");
   const [activeSubCategoryVideo, setActiveSubCategoryVideo] = useState("All");
 
+  const [loadingUser, setLoadingUser] = useState(true);
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const loadCreditData = async () => {
+    setLoadingUser(true);
     try {
       const res = await axios.get(`${backendUrl}/api/user/credit`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -26,17 +29,35 @@ const AppContextProvider = ({ children }) => {
 
       if (res.data.success) {
         const creditInfo = res.data.data;
+
         setCredits(creditInfo.credit);
-        setUser({ name: creditInfo.name, email: creditInfo.email });
+
+        // ✅ include all relevant fields: id, name, email, isAdmin
+        setUser({
+          id: creditInfo.id || creditInfo._id,
+          name: creditInfo.name,
+          email: creditInfo.email,
+          isAdmin: !!creditInfo.isAdmin, // make sure backend returns this
+        });
+        console.log("User after setting:", {
+          id: creditInfo.id || creditInfo._id,
+          name: creditInfo.name,
+          email: creditInfo.email,
+          isAdmin: creditInfo.isAdmin || false,
+        });
       }
     } catch (error) {
       console.log("Credit fetch error:", error.response?.data || error.message);
+    } finally {
+      setLoadingUser(false);
     }
   };
 
   useEffect(() => {
     if (token) {
       loadCreditData();
+    } else {
+      setLoadingUser(false);
     }
   }, [token]);
 
@@ -50,7 +71,7 @@ const AppContextProvider = ({ children }) => {
         backendUrl,
         token,
         setToken,
-        projects, // <-- provide projects
+        projects,
         setProjects,
         activeCategory,
         setActiveCategory,
@@ -62,6 +83,7 @@ const AppContextProvider = ({ children }) => {
         setActiveSourceVideo,
         activeSubCategoryVideo,
         setActiveSubCategoryVideo,
+        loadingUser, // <-- add this
       }}
     >
       {children}

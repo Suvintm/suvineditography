@@ -113,13 +113,13 @@ const Navbar = () => {
 
       {/* Navbar content */}
       <nav className="relative px-4 sm:px-20 py-3 pt-4 flex justify-between items-center w-full z-10 text-white">
-        <div className="flex sm:gap-4 gap-3 items-center">
+        <div className="flex sm:m-4 sm:border-white/50 sm:rounded-4xl sm:border-2 sm:p-4 sm:gap-4 gap-3 items-center">
           <img
             src={logo}
             alt="logo"
-            className="w-8 h-8 border-2 border-white rounded-3xl"
+            className="w-8 h-8 sm:w-12 sm:h-12 border-2 border-white rounded-3xl"
           />
-          <span className="font-bold text-[14px] text-white">
+          <span className="font-bold text-[14px] sm:text-[24px] text-white">
             SuvinEditography
           </span>
         </div>

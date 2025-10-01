@@ -6,10 +6,12 @@ import logo from "../assets/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 import { AppContext } from "../context/AppContext";
 import playNotificationSound from "../utils/playSound.js";
+import LoadingSplash from "../components/LoadingSplash";
 
 function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
   const navigate = useNavigate();
 
   const { setUser, setToken, backendUrl } = useContext(AppContext);
@@ -33,7 +35,8 @@ function Signup() {
         playNotificationSound();
         toast.success("Account created successfully!");
         console.log("User after signup:", data.user);
-        setTimeout(() => navigate("/"), 1200);
+        setShowSplash(true);
+        setTimeout(() => navigate("/"), 2000);
       } else {
         playNotificationSound();
         toast.error(data.message || "Signup failed");
@@ -46,6 +49,8 @@ function Signup() {
       setLoading(false);
     }
   };
+
+  if (showSplash) return <LoadingSplash />;
 
   return (
     <>

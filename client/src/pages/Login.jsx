@@ -6,10 +6,12 @@ import logo from "../assets/logo.png";
 import "react-toastify/dist/ReactToastify.css";
 import { AppContext } from "../context/AppContext";
 import playNotificationSound from "../utils/playSound.js";
+import LoadingSplash from "../components/LoadingSplash";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
   const navigate = useNavigate();
 
   const { setUser, setToken, backendUrl } = useContext(AppContext);
@@ -32,8 +34,9 @@ function Login() {
         setUser(data.user);
         playNotificationSound();
         toast.success("Logged in successfully!");
+        setShowSplash(true);
 
-        setTimeout(() => navigate("/"), 1200);
+        setTimeout(() => navigate("/"), 2000);
       } else {
         toast.error(data.message || "Invalid credentials");
       }
@@ -45,6 +48,8 @@ function Login() {
       setLoading(false);
     }
   };
+
+  if (showSplash) return <LoadingSplash />;
 
   return (
     <>

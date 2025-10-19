@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
+import profile from "../assets/profile2.jpg";
 import { IoMdClose, IoIosPricetags, IoIosOptions } from "react-icons/io";
 import { RiHeartFill, RiHome7Line, RiProfileFill } from "react-icons/ri";
 import {
@@ -67,6 +68,22 @@ const Navbar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [currentBg, setCurrentBg] = useState(0);
 
+  // Add this inside Navbar component, before return
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   const Navigate = useNavigate();
@@ -91,7 +108,7 @@ const Navbar = () => {
   return (
     <div className="relative w-full">
       {/* Background slideshow */}
-      <div className="absolute inset-0 sm:h-80 h-40 overflow-hidden ">
+      <div className="absolute inset-0 sm:h-80 h-40 overflow-hidden z-0">
         {HEADER_IMAGES.map((img, index) => (
           <div
             key={index}
@@ -111,8 +128,12 @@ const Navbar = () => {
         <div className="absolute inset-0 bg-black/50 backdrop-brightness-100"></div>
       </div>
 
-      {/* Navbar content */}
-      <nav className="relative px-4 sm:px-20 py-3 pt-4 flex justify-between items-center w-full z-10 text-white">
+      {/* Navbar content (sticky) */}
+      <nav
+        className={`fixed top-0 left-0 w-full z-50 px-4 sm:px-20 py-3 pt-4 flex justify-between items-center text-white transition-colors duration-300 ${
+          scrolled ? "bg-indigo-600/80 backdrop-blur-md" : "bg-transparent"
+        }`}
+      >
         <div className="flex sm:m-4 sm:border-white/50 sm:rounded-4xl sm:border-2 sm:p-4 sm:gap-4 gap-3 items-center">
           <img
             src={logo}
@@ -125,15 +146,15 @@ const Navbar = () => {
         </div>
 
         {/* Right section */}
-        <div className="flex items-center sm:gap-6 sm:pr-20">
+        <div className="flex items-center sm:gap-12 sm:pr-20">
           <Link
-            to="/buy-credit"
-            className="flex gap-1 sm:gap-2 text-[12px] bg-black-400/20 border items-center justify-center mr-2 border-white/50 text-white px-2 py-2 rounded-full font-medium"
+            to="/buy-credits"
+            className="flex gap-1 sm:gap-3 text-[12px] sm:text-[18px] bg-black-400/20 border items-center justify-center mr-2 border-white/50 text-white px-2 py-2 rounded-full font-medium"
           >
-            <WalletIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Credits: {credits}
+            <WalletIcon className="w-4 h-4 sm:w-6 sm:h-6" /> Credits: {credits}
           </Link>
           <button onClick={toggleSidebar} className="text-white text-2xl">
-            <IoIosOptions />
+            <IoIosOptions className="sm:w-8 sm:h-8" />
           </button>
         </div>
       </nav>
@@ -175,9 +196,9 @@ const Navbar = () => {
         </ul>
       </div>
 
-      {/* ✅ Mobile scroll menu */}
-      <div className="relative sm:hidden justify-center items flex px-2 pt-6 pb-2 z-10">
-        <ul className="flex space-x-2 overflow-x-auto  scrollbar-hidden">
+      {/* Mobile scroll menu */}
+      <div className="relative sm:hidden justify-center items flex px-2 pt-22 pb-2 z-10">
+        <ul className="flex space-x-2 overflow-x-auto scrollbar-hidden">
           {MOBILE_MENU.map((item, i) => (
             <li
               key={i}
@@ -214,16 +235,16 @@ const Navbar = () => {
         </div>
         <div>
           <h1 className="font-bold text-center mx-8 p-1 bg-blue-100 sm:mx-15 rounded-2xl sm:p-2 sm:text-2xl">
-            Profile & Menu{" "}
+            Profile & Menu
           </h1>
         </div>
 
         {/* Profile Content */}
-        <div className="flex flex-col border-white border-1 rounded-3xl shadow-2xl  shadow-blue-300 text-black  items-center mt-6 p-4">
+        <div className="flex flex-col border-white border-1 rounded-3xl shadow-2xl shadow-blue-300 text-black items-center mt-6 p-4">
           <div className="flex items-center gap-2 sm:gap-6 w-full">
             <div className="rounded-full border-2 border-zinc-500 overflow-hidden max-w-16 max-h-16 sm:max-w-20 sm:max-h-20 items-center-safe text-center">
               <img
-                src={user?.avatar || logo}
+                src={user?.avatar || profile}
                 alt="profile"
                 className="w-20 h-20 rounded-full object-cover"
               />
@@ -266,7 +287,7 @@ const Navbar = () => {
           </Link>
           <Link
             to="/about"
-            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl  font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
+            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
             <InfoIcon className="w-4 h-4 sm:w-5 sm:h-5" /> About
           </Link>
@@ -275,7 +296,7 @@ const Navbar = () => {
               Navigate("/login");
               console.log("Logged out");
             }}
-            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl   font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
+            className="flex justify-center bg-black min-w-40 sm:min-w-60 p-1 sm:p-2 rounded-3xl font-semibold text-center text-white hover:text-black hover:bg-white hover:border hover:border-black sm:gap-2 gap-1 items-center-safe"
           >
             <LogOutIcon className="w-4 h-4 sm:w-5 sm:h-5" /> Logout
           </button>

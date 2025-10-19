@@ -10,11 +10,12 @@ import GoToStudio from "../components/GoToStudioCard";
 
 const Home = () => {
   return (
-    <div className=" bg-black min-h-screen">
+    <div className="bg-black min-h-screen pt- sm:pt-28">
+      {/* pt-20 for mobile, sm:pt-28 for larger screens */}
       <Navbar />
       <Header />
       <BtnOwnModel />
-      <Carousel />;
+      <Carousel />
       <GoToStudio />
       <FreeToolContainer />
       <Cardcontainer />

@@ -14,6 +14,7 @@ import PixabayStock from "./pages/PixabayStock.jsx";
 import StockPage from "./pages/StockPage.jsx";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import BuyPage from "./pages/BuyPage.jsx"; // ✅ new import
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,10 +26,9 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const App = () => {
   return (
-    <div className="min-h-screen">
+    <div>
       <Routes>
         {/* Public Routes */}
-
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -66,6 +66,16 @@ const App = () => {
           element={
             <ProtectedRoute>
               <StudioEditor />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Buy Credits Page */}
+        <Route
+          path="/buy-credits"
+          element={
+            <ProtectedRoute>
+              <BuyPage />
             </ProtectedRoute>
           }
         />

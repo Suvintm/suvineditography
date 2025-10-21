@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import Cardcontainer from "../components/Cardcontainer";
@@ -7,11 +7,31 @@ import Footer from "../components/Footer";
 import BtnOwnModel from "../components/BtnOwnModel";
 import FreeToolContainer from "../components/FreeToolsContainer";
 import GoToStudio from "../components/GoToStudioCard";
+import LoaderAnimation from "../components/LoaderAnimation";
 
 const Home = () => {
+  const [showLoader, setShowLoader] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowLoader(false), 2000); // 200ms delay
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showLoader) {
+    return (
+      <LoaderAnimation
+        src="/animations/loader.lottie"
+        width={220}
+        height={220}
+        logoSrc="/logo.png" // optional, default provided
+        appName="SuvinEditography" // optional, default provided
+      />
+    );
+  }
+
+
   return (
-    <div className="bg-black min-h-screen pt- sm:pt-28">
-      {/* pt-20 for mobile, sm:pt-28 for larger screens */}
+    <div className="bg-black min-h-screen pt-20 sm:pt-28">
       <Navbar />
       <Header />
       <BtnOwnModel />

@@ -31,7 +31,7 @@ const Home = () => {
 
 
   return (
-    <div className="bg-black min-h-screen pt-20 sm:pt-28">
+    <div className="bg-black min-h-screen pt-0 sm:pt-28">
       <Navbar />
       <Header />
       <BtnOwnModel />

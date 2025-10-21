@@ -12,7 +12,9 @@
   "dependencies": {
     "@fontsource/poppins": "^5.2.6",
     "@heroicons/react": "^2.2.0",
+    "@lottiefiles/dotlottie-web": "^0.54.1",
     "@tailwindcss/vite": "^4.1.11",
+    "antd": "^5.27.4",
     "axios": "^1.11.0",
     "fabric": "^5.3.0",
     "fabric-pure-browser": "^5.1.0",

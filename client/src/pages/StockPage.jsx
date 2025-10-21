@@ -131,6 +131,47 @@ export default function StockPage() {
     }
   };
 
+  const ShimmerSkeleton = () => {
+    return (
+      <div className="animate-pulse space-y-4">
+        {/* Search bar skeleton */}
+        
+
+        {/* Category bar skeleton */}
+        <div className="flex space-x-2 overflow-x-auto pb-2">
+          {Array(6)
+            .fill("")
+            .map((_, i) => (
+              <div
+                key={i}
+                className="w-20 h-8 bg-gray-300 rounded-full shrink-0"
+              ></div>
+            ))}
+        </div>
+
+        {/* Masonry-style grid skeleton */}
+        <div className="columns-2 sm:columns-3 lg:columns-6 gap-4 p-2">
+          {Array(18)
+            .fill("")
+            .map((_, i) => (
+              <div
+                key={i}
+                className="mb-4 break-inside-avoid rounded-3xl bg-white shadow-sm overflow-hidden"
+              >
+                <div className="w-full h-40 bg-gray-300"></div>
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+                  <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
+
   return (
     <div className="min-h-screen flex flex-col bg-blue-50">
       {/* Navbar
@@ -143,8 +184,8 @@ export default function StockPage() {
 
       <div className="p-4 space-y-4 flex-1">
         {/* Search bar */}
-        <div className="relative w-full max-w-lg mx-auto">
-          <div className="flex items-center  rounded-full bg-white px-3 py-2 ">
+        <div className="relative w-full max-w-lg mx-auto ">
+          <div className="flex items-center border border-gray-600 sm:p-4 rounded-full bg-white px-3 py-2 ">
             <Search className="w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -176,12 +217,12 @@ export default function StockPage() {
         </div>
 
         {/* Type scroll bar */}
-        <div className="flex space-x-2 overflow-x-auto pb-2">
+        <div className="flex space-x-2 overflow-x-auto sm:gap-10 pb-2">
           {types.map((t) => (
             <button
               key={t}
               onClick={() => setActiveType(t)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition ${
+              className={`px-4 py-2 sm:px-20 sm:shadow-black sm:shadow-md rounded-full whitespace-nowrap transition ${
                 activeType === t
                   ? "bg-black border-1 border-white text-white"
                   : "bg-white text-black hover:bg-gray-100"
@@ -211,51 +252,45 @@ export default function StockPage() {
           </div>
         )}
 
-        {/* Loader */}
         {loading && (
-          <div className="flex justify-center py-10">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <div className="py-6">
+            <ShimmerSkeleton />
           </div>
         )}
 
         {/* Stocks grid */}
+        {/* Masonry layout like Pinterest */}
         {!loading && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4    rounded-3xl">
+          <div className="columns-2 sm:columns-3 lg:columns-6 gap-4 p-2">
             {stocks.map((stock) => (
               <div
+                onClick={() => setSelectedStock(stock)}
                 key={stock._id}
-                className="bg-white border-1 border-white rounded-3xl overflow-hidden flex flex-col hover:shadow-lg transition"
+                className="mb-4 break-inside-avoid overflow-hidden bg-white rounded-3xl shadow-sm hover:shadow-2xl hover:shadow-blue-500 transition flex flex-col"
               >
-                {/* Preview */}
                 {/* Preview */}
                 <div className="relative w-full bg-black flex justify-center items-center">
                   {stock.type === "video" ? (
                     <video
                       src={stock.url}
                       controls
-                      className="w-full max-h-80 object-contain"
+                      className="w-full rounded-t-3xl object-cover"
                     />
                   ) : stock.type === "audio" || stock.type === "music" ? (
-                    <audio src={stock.url} controls className="w-full" />
+                    <div className="w-full bg-gray-100 p-3 flex flex-col items-center">
+                      <audio src={stock.url} controls className="w-full" />
+                    </div>
                   ) : (
                     <img
                       src={stock.url}
                       alt={stock.title}
-                      className="w-full max-h-80 object-contain"
+                      className="w-full rounded-t-3xl object-cover"
                     />
                   )}
-                  {/* ✅ Premium Watermark
-                  {stock.status === "free" && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-yellow-400/70 text-lg sm:text-2xl font-bold bg-black/40 px-3 py-1 rounded-lg">
-                        Premium
-                      </span>
-                    </div>
-                  )} */}
                 </div>
 
+                {/* Content */}
                 <div className="p-3 flex flex-col flex-1">
-                  {/* Uploader */}
                   <div className="flex items-center space-x-2">
                     <img
                       src="/logo.png"
@@ -264,7 +299,7 @@ export default function StockPage() {
                     />
                     <div className="flex flex-col">
                       <span className="text-xs text-gray-500">Uploaded by</span>
-                      <span className="sm:text-sm text-[12px] font-medium flex items-center">
+                      <span className="sm:text-sm text-[10px] font-medium flex items-center">
                         {stock.uploaderName}
                         {stock.uploaderName === "suvineditography" && (
                           <CheckBadgeIcon className="w-3 h-4 text-blue-500 ml-1" />
@@ -275,8 +310,7 @@ export default function StockPage() {
 
                   <h3 className="font-semibold text-sm mt-2">{stock.title}</h3>
 
-                  {/* Tags */}
-                  {stock.tags && stock.tags.length > 0 && (
+                  {stock.tags?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {stock.tags.map((tag) => (
                         <span
@@ -290,9 +324,8 @@ export default function StockPage() {
                     </div>
                   )}
 
-                  {/* Status */}
                   <span
-                    className={`mt-2 inline-block w-15 items-center-safe justify-center-safe px-4 py-0.5 text-xs rounded-full mb-1 ${
+                    className={`mt-2 inline-block w-fit px-3 py-0.5 text-xs rounded-full ${
                       stock.status === "free"
                         ? "bg-green-400 text-white"
                         : "bg-yellow-100 text-yellow-700"
@@ -300,19 +333,17 @@ export default function StockPage() {
                   >
                     {stock.status.toUpperCase()}
                   </span>
-                  <div className="flex items-center justify-between mt-1 mb-1">
-                    <span className="text-xs text-gray-500">
-                      Downloads: {stock.downloads || 0}
-                    </span>
+
+                  <div className="flex items-center justify-between mt-1 mb-1 text-xs text-gray-500">
+                    <span>Downloads: {stock.downloads || 0}</span>
                   </div>
 
-                  {/* Download btn */}
                   <button
                     onClick={() => setSelectedStock(stock)}
                     className="mt-auto bg-black text-white gap-1 py-1.5 px-3 rounded-md flex items-center text-[12px] justify-center hover:bg-blue-700 transition"
                   >
                     <span>View &</span>
-                    <Download className="w-4 h-4 mr-1  " />
+                    <Download className="w-4 h-4 mr-1" />
                   </button>
                 </div>
               </div>

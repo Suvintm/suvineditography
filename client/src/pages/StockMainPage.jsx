@@ -66,14 +66,14 @@ export default function StockMainPage() {
 
         {/* Nav bar */}
         <nav className="relative px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center sm:gap-4 sm:ml-6 space-x-2">
             
             <img
               src={logo}
               alt="logo"
               className="w-8 h-8 border-2 border-white rounded-3xl"
             />
-            <span className="font-bold text-lg text-white">
+            <span className="font-bold sm:text-[25px] text-lg text-white">
               SuvinEditography
             </span>
           </Link>
@@ -85,7 +85,7 @@ export default function StockMainPage() {
         </div>
 
         {/* Scrollable source selector */}
-        <div className="relative flex space-x-2 overflow-x-auto px-2 pb-2 mt-2 mb-4">
+        <div className="relative flex space-x-2 overflow-x-auto sm:ml-6 px-2 pb-2 mt-2 mb-4">
           {SOURCES.map((src) => {
             const { name, logo, verified } = SOURCE_CONFIG[src];
             return (
@@ -93,7 +93,7 @@ export default function StockMainPage() {
                 key={src}
                 to={`/stocks/${src}`}
                 className={({ isActive }) =>
-                  `flex items-center space-x-2 px-1 py-2 rounded-full whitespace-nowrap transition text-[12px] ${
+                  `flex items-center space-x-2 px-1 py-2 sm:p-5 rounded-full whitespace-nowrap transition text-[12px] ${
                     isActive
                       ? "bg-black border border-white/50 text-white"
                       : "bg-white font-bold text-black hover:bg-white/90"

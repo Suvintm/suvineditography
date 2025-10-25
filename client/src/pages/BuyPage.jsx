@@ -1,8 +1,10 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { IoIosOptions, IoMdClose } from "react-icons/io";
 import { WalletIcon } from "lucide-react";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
 // Credit packages
 const creditPackages = [
@@ -10,7 +12,7 @@ const creditPackages = [
     id: 1,
     name: "Basic",
     credits: 50,
-    price: 5,
+    price: 5, // INR
     description: "Get started with 50 credits",
     bgColor: "bg-gradient-to-r from-purple-500 to-indigo-500",
   },
@@ -42,15 +44,79 @@ const creditPackages = [
 
 const BuyPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { credits, user, token, backendUrl, setCredits } =
+    useContext(AppContext);
+
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
-  const { credits } = useContext(AppContext);
+  useEffect(() => {
+    // Check if Razorpay script is loaded
+    if (!window.Razorpay) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => console.log("Razorpay SDK loaded");
+      script.onerror = () => console.error("Razorpay SDK failed to load");
+      document.body.appendChild(script);
+    }
+  }, []);
+
+ const handleBuy = async (pkg) => {
+   if (!token) return toast.error("You must be logged in to buy credits.");
+
+   try {
+     const res = await axios.post(
+       `${backendUrl}/api/payment/create-order`,
+       {
+         amount: pkg.price, // send actual INR amount, backend multiplies by 100
+         credits: pkg.credits,
+         packName: pkg.name,
+       },
+       { headers: { Authorization: `Bearer ${token}` } }
+     );
+
+     const { order } = res.data;
+
+     const options = {
+       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+       amount: order.amount,
+       currency: order.currency,
+       name: "SuvinEditography",
+       description: pkg.description,
+       order_id: order.id,
+       handler: async function (response) {
+         // Send payment details to backend to verify & update DB
+         await axios.post(
+           `${backendUrl}/api/payment/verify-payment`,
+           {
+             razorpay_order_id: response.razorpay_order_id,
+             razorpay_payment_id: response.razorpay_payment_id,
+             razorpay_signature: response.razorpay_signature,
+             credits: pkg.credits,
+           },
+           { headers: { Authorization: `Bearer ${token}` } }
+         );
+
+         toast.success(`${pkg.credits} credits added!`);
+         setCredits((prev) => prev + pkg.credits);
+       },
+       prefill: { name: user.name, email: user.email },
+       notes: { userId: user.id, credits: pkg.credits, packName: pkg.name },
+       theme: { color: "#2563EB" },
+     };
+
+     const rzp = new window.Razorpay(options);
+     rzp.open();
+   } catch (error) {
+     console.error("Payment error:", error.response || error.message);
+     toast.error("Payment failed. Check console.");
+   }
+ };
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar - Sticky */}
+      {/* Navbar */}
       <nav className="fixed top-0 left-0 w-full px-4 sm:px-20 py-4 flex justify-between items-center bg-white shadow-md z-50">
-        {/* Logo + Name */}
         <div className="flex items-center gap-1">
           <img
             src={logo}
@@ -61,8 +127,6 @@ const BuyPage = () => {
             SuvinEditography
           </span>
         </div>
-
-        {/* Credits + Sidebar toggle */}
         <div className="flex items-center gap-4">
           <div className="flex gap-1 sm:gap-3 text-[12px] sm:text-[16px] bg-black/20 border border-black/30 items-center justify-center px-3 py-2 rounded-full font-medium text-black">
             <WalletIcon className="w-5 h-5 sm:w-6 sm:h-6" /> Credits: {credits}
@@ -93,7 +157,6 @@ const BuyPage = () => {
         </div>
       </div>
 
-      {/* Overlay */}
       {isSidebarOpen && (
         <div
           onClick={toggleSidebar}
@@ -101,7 +164,7 @@ const BuyPage = () => {
         ></div>
       )}
 
-      {/* Page Header */}
+      {/* Header */}
       <header className="pt-28 text-center py-2">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
           Buy Credits
@@ -111,20 +174,26 @@ const BuyPage = () => {
         </p>
       </header>
 
-      {/* Credit Packages */}
+      {/* Packages */}
       <main className="pt-4 px-4 md:px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {creditPackages.map((pkg) => (
           <div
             key={pkg.id}
-            className={`rounded-2xl p-6 text-white shadow-xl transform hover:scale-105 transition duration-300 ${pkg.bgColor}`}
+            className={`relative rounded-2xl p-6 text-white shadow-xl transform hover:scale-105 transition duration-300 ${pkg.bgColor}`}
           >
+            <span className="absolute top-3 right-3 bg-black/30 px-2 py-1 rounded-full text-xs">
+              {pkg.name}
+            </span>
             <h2 className="text-2xl font-bold">{pkg.name}</h2>
             <p className="mt-2 text-lg">{pkg.description}</p>
             <p className="mt-4 text-4xl font-extrabold">
               {pkg.credits} Credits
             </p>
-            <p className="mt-1 text-xl font-semibold">${pkg.price}</p>
-            <button className="mt-6 w-full bg-white text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-200 transition">
+            <p className="mt-1 text-xl font-semibold">₹{pkg.price}</p>
+            <button
+              onClick={() => handleBuy(pkg)}
+              className="mt-6 w-full bg-white text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-200 transition"
+            >
               Buy Now
             </button>
           </div>

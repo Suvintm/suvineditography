@@ -6,16 +6,19 @@ import { WalletIcon } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import Lottie from "react-lottie-player";
+import paymentAnimation from "../assets/lottie/payment.json"; // <-- Add a Lottie JSON animation here
 
 const BuyPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [creditPackages, setCreditPackages] = useState([]);
+  const [isLoadingPayment, setIsLoadingPayment] = useState(false); // new
   const { credits, user, token, backendUrl, setCredits } =
     useContext(AppContext);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
-  // ✅ Fetch packs from backend
+  // Fetch packs
   useEffect(() => {
     const fetchPacks = async () => {
       try {
@@ -30,7 +33,7 @@ const BuyPage = () => {
     fetchPacks();
   }, [backendUrl]);
 
-  // ✅ Load Razorpay SDK
+  // Load Razorpay SDK
   useEffect(() => {
     if (!window.Razorpay) {
       const script = document.createElement("script");
@@ -42,9 +45,10 @@ const BuyPage = () => {
     }
   }, []);
 
-  // ✅ Handle Buy
+  // Handle Buy
   const handleBuy = async (pkg) => {
     if (!token) return toast.error("You must be logged in to buy credits.");
+    setIsLoadingPayment(true); // start Lottie animation
 
     try {
       const res = await axios.post(
@@ -88,14 +92,32 @@ const BuyPage = () => {
 
       const rzp = new window.Razorpay(options);
       rzp.open();
+
+      // Hide animation when Razorpay opens or fails
+      rzp.on("ready", () => setIsLoadingPayment(false));
+      rzp.on("payment.failed", () => setIsLoadingPayment(false));
     } catch (error) {
       console.error("Payment error:", error.response || error.message);
       toast.error("Payment failed. Check console.");
+      setIsLoadingPayment(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 relative">
+      {/* Lottie Loading Overlay */}
+      {isLoadingPayment && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70">
+          <Lottie
+            loop
+            animationData={paymentAnimation}
+            play
+            style={{ width: 200, height: 200 }}
+          />
+          <p className="text-white text-xl mt-4">Processing Payment...</p>
+        </div>
+      )}
+
       {/* Navbar */}
       <nav className="fixed top-0 left-0 w-full px-4 sm:px-20 py-4 flex justify-between items-center bg-white shadow-md z-50">
         <div className="flex items-center gap-1">

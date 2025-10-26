@@ -15,6 +15,7 @@ import adminStockRouter from "./routes/adminStockRoute.js";
 import adminRouter from "./routes/adminRoute.js";
  // server.js
 import paymentRouter from "./routes/paymentRoute.js";
+import adminPackRoutes from "./routes/adminPackRoutes.js";
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -37,6 +38,9 @@ app.use("/api/payment", paymentRouter);
 
 //// Admin routes
 app.use("/api/admin", adminRouter);
+app.use("/api/admin/packs", adminPackRoutes);
+
+
 
 // Admin stock routes
 app.use("/api/admin/stocks", adminStockRouter);

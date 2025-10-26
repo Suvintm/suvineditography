@@ -1,53 +1,48 @@
+// controllers/adminController.js
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// Hardcoded admin credentials (plain text)
-const ADMINS = [
-  { email: "admin@suvineditography.com", password: "Admin@123" },
-  { email: "suvinadmin@gmail.com", password: "Admin@123" },
-];
-
-// Admin login
 export const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
 
-    if (!email || !password) {
+    if (!email || !password)
       return res
         .status(400)
         .json({ success: false, message: "Email and password required" });
-    }
 
-    const admin = ADMINS.find((a) => a.email === email);
-
-    if (!admin || admin.password !== password) {
+    if (email !== adminEmail)
       return res
         .status(401)
-        .json({ success: false, message: "Invalid email or password" });
-    }
+        .json({ success: false, message: "Invalid admin email" });
+
+    const isMatch = await bcrypt.compare(password, adminPasswordHash);
+    if (!isMatch)
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid admin password" });
 
     const token = jwt.sign(
-      { email: admin.email, isAdmin: true },
+      { email: adminEmail, isAdmin: true },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Admin logged in successfully",
+      message: "Admin login successful",
       token,
-      admin: { email: admin.email, isAdmin: true },
+      admin: { email: adminEmail },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Admin login error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Admin logout
+// Logout route (stateless JWT)
 export const adminLogout = async (req, res) => {
-  try {
-    // JWT is stateless; frontend will remove token
-    res.json({ success: true, message: "Admin logged out successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 };

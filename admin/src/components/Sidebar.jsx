@@ -33,6 +33,21 @@ export default function Sidebar() {
               Upload Stocks
             </NavLink>
           </li>
+          
+
+        <li>
+          <NavLink
+            to="/upload-pack"
+            className={({ isActive }) =>
+              `block px-3 py-2 rounded-md ${
+                isActive ? "bg-blue-600" : "hover:bg-gray-700"
+              }`
+            }
+          >
+            Upload Pack
+          </NavLink>
+        </li>
+
         </ul>
       </nav>
     </aside>

@@ -4,10 +4,7 @@ import adminAuth from "../middleware/adminAuth.js";
 
 const router = express.Router();
 
-// Admin login
 router.post("/login", adminLogin);
-
-// Admin logout (optional, just returns message)
 router.post("/logout", adminAuth, adminLogout);
 
 export default router;

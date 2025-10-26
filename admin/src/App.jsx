@@ -4,13 +4,14 @@ import AdminHome from "./pages/AdminHome";
 import UploadStocks from "./pages/UploadStocks";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminPackUpload from "./pages/AdminPackUpload";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // import the CSS
 
 export default function App() {
   return (
-    < >
+    <>
       <Routes>
         <Route path="/admin-login" element={<AdminLogin />} />
 
@@ -28,6 +29,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <UploadStocks />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/upload-pack"
+            element={
+              <ProtectedRoute>
+                <AdminPackUpload />
               </ProtectedRoute>
             }
           />

@@ -1,3 +1,4 @@
+// src/pages/BuyPage.jsx
 import React, { useState, useContext, useEffect } from "react";
 import logo from "../assets/logo.png";
 import { IoIosOptions, IoMdClose } from "react-icons/io";
@@ -6,51 +7,31 @@ import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-// Credit packages
-const creditPackages = [
-  {
-    id: 1,
-    name: "Basic",
-    credits: 50,
-    price: 5, // INR
-    description: "Get started with 50 credits",
-    bgColor: "bg-gradient-to-r from-purple-500 to-indigo-500",
-  },
-  {
-    id: 2,
-    name: "Standard",
-    credits: 120,
-    price: 10,
-    description: "Best value: 120 credits",
-    bgColor: "bg-gradient-to-r from-green-400 to-teal-500",
-  },
-  {
-    id: 3,
-    name: "Premium",
-    credits: 250,
-    price: 20,
-    description: "Unlock 250 credits",
-    bgColor: "bg-gradient-to-r from-yellow-400 to-orange-500",
-  },
-  {
-    id: 4,
-    name: "Ultimate",
-    credits: 500,
-    price: 35,
-    description: "500 credits for power users",
-    bgColor: "bg-gradient-to-r from-red-400 to-pink-500",
-  },
-];
-
 const BuyPage = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [creditPackages, setCreditPackages] = useState([]);
   const { credits, user, token, backendUrl, setCredits } =
     useContext(AppContext);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
+  // ✅ Fetch packs from backend
   useEffect(() => {
-    // Check if Razorpay script is loaded
+    const fetchPacks = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/api/admin/packs`);
+        console.log("Fetched packs:", res.data);
+        setCreditPackages(res.data);
+      } catch (error) {
+        console.error("Failed to fetch credit packs:", error);
+        toast.error("Failed to load credit packs");
+      }
+    };
+    fetchPacks();
+  }, [backendUrl]);
+
+  // ✅ Load Razorpay SDK
+  useEffect(() => {
     if (!window.Razorpay) {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -61,57 +42,57 @@ const BuyPage = () => {
     }
   }, []);
 
- const handleBuy = async (pkg) => {
-   if (!token) return toast.error("You must be logged in to buy credits.");
+  // ✅ Handle Buy
+  const handleBuy = async (pkg) => {
+    if (!token) return toast.error("You must be logged in to buy credits.");
 
-   try {
-     const res = await axios.post(
-       `${backendUrl}/api/payment/create-order`,
-       {
-         amount: pkg.price, // send actual INR amount, backend multiplies by 100
-         credits: pkg.credits,
-         packName: pkg.name,
-       },
-       { headers: { Authorization: `Bearer ${token}` } }
-     );
+    try {
+      const res = await axios.post(
+        `${backendUrl}/api/payment/create-order`,
+        {
+          amount: pkg.price,
+          credits: pkg.credits,
+          packName: pkg.name,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-     const { order } = res.data;
+      const { order } = res.data;
 
-     const options = {
-       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-       amount: order.amount,
-       currency: order.currency,
-       name: "SuvinEditography",
-       description: pkg.description,
-       order_id: order.id,
-       handler: async function (response) {
-         // Send payment details to backend to verify & update DB
-         await axios.post(
-           `${backendUrl}/api/payment/verify-payment`,
-           {
-             razorpay_order_id: response.razorpay_order_id,
-             razorpay_payment_id: response.razorpay_payment_id,
-             razorpay_signature: response.razorpay_signature,
-             credits: pkg.credits,
-           },
-           { headers: { Authorization: `Bearer ${token}` } }
-         );
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "SuvinEditography",
+        description: pkg.description,
+        order_id: order.id,
+        handler: async function (response) {
+          await axios.post(
+            `${backendUrl}/api/payment/verify-payment`,
+            {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              credits: pkg.credits,
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
 
-         toast.success(`${pkg.credits} credits added!`);
-         setCredits((prev) => prev + pkg.credits);
-       },
-       prefill: { name: user.name, email: user.email },
-       notes: { userId: user.id, credits: pkg.credits, packName: pkg.name },
-       theme: { color: "#2563EB" },
-     };
+          toast.success(`${pkg.credits} credits added!`);
+          setCredits((prev) => prev + pkg.credits);
+        },
+        prefill: { name: user.name, email: user.email },
+        notes: { userId: user.id, credits: pkg.credits, packName: pkg.name },
+        theme: { color: "#2563EB" },
+      };
 
-     const rzp = new window.Razorpay(options);
-     rzp.open();
-   } catch (error) {
-     console.error("Payment error:", error.response || error.message);
-     toast.error("Payment failed. Check console.");
-   }
- };
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Payment error:", error.response || error.message);
+      toast.error("Payment failed. Check console.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -176,28 +157,36 @@ const BuyPage = () => {
 
       {/* Packages */}
       <main className="pt-4 px-4 md:px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {creditPackages.map((pkg) => (
-          <div
-            key={pkg.id}
-            className={`relative rounded-2xl p-6 text-white shadow-xl transform hover:scale-105 transition duration-300 ${pkg.bgColor}`}
-          >
-            <span className="absolute top-3 right-3 bg-black/30 px-2 py-1 rounded-full text-xs">
-              {pkg.name}
-            </span>
-            <h2 className="text-2xl font-bold">{pkg.name}</h2>
-            <p className="mt-2 text-lg">{pkg.description}</p>
-            <p className="mt-4 text-4xl font-extrabold">
-              {pkg.credits} Credits
-            </p>
-            <p className="mt-1 text-xl font-semibold">₹{pkg.price}</p>
-            <button
-              onClick={() => handleBuy(pkg)}
-              className="mt-6 w-full bg-white text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-200 transition"
+        {creditPackages.length === 0 ? (
+          <p className="text-center text-gray-500 col-span-full">
+            No credit packs available yet.
+          </p>
+        ) : (
+          creditPackages.map((pkg) => (
+            <div
+              key={pkg._id}
+              className={`relative rounded-2xl p-6 text-white shadow-xl transform hover:scale-105 transition duration-300 ${
+                pkg.bgColor || "bg-gradient-to-r from-gray-400 to-gray-600"
+              }`}
             >
-              Buy Now
-            </button>
-          </div>
-        ))}
+              <span className="absolute top-3 right-3 bg-black/30 px-2 py-1 rounded-full text-xs">
+                {pkg.name}
+              </span>
+              <h2 className="text-2xl font-bold">{pkg.name}</h2>
+              <p className="mt-2 text-lg">{pkg.description}</p>
+              <p className="mt-4 text-4xl font-extrabold">
+                {pkg.credits} Credits
+              </p>
+              <p className="mt-1 text-xl font-semibold">₹{pkg.price}</p>
+              <button
+                onClick={() => handleBuy(pkg)}
+                className="mt-6 w-full bg-white text-gray-800 font-semibold py-2 rounded-lg hover:bg-gray-200 transition"
+              >
+                Buy Now
+              </button>
+            </div>
+          ))
+        )}
       </main>
     </div>
   );

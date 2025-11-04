@@ -6,7 +6,6 @@ import {
   CheckCircle,
   XCircle,
   Info,
-  Loader2,
   X,
   Clock,
   Mail,
@@ -16,6 +15,53 @@ import {
 import { IoMdReturnLeft } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
+// Skeleton Loader Component
+const NotificationSkeleton = () => {
+  return (
+    <div className="animate-pulse min-h-screen bg-gradient-to-b from-indigo-50 to-white p-6 sm:p-12">
+      <div
+        onClick={() => Navigate("/")}
+        className="flex items-center gap-4 mb-8 text-indigo-700 font-semibold text-lg cursor-pointer"
+      >
+        <IoMdReturnLeft />
+        Back
+      </div>
+
+      {/* Heading Skeleton */}
+      <h1 className="text-3xl font-bold text-indigo-700 mb-4 text-center">
+        Notifications
+      </h1>
+      {/* Filter Buttons + Mark All Skeleton */}
+      <div className="max-w-3xl mx-auto flex justify-between items-center mb-6 flex-wrap gap-3">
+        <div className="flex gap-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-10 w-24 border-gray-500 bg-gray-300 rounded-full"></div>
+          ))}
+        </div>
+        <div className="h-10 w-36 bg-gray-300 rounded-full"></div>
+      </div>
+
+      {/* Notification Card Skeletons */}
+      <div className="max-w-3xl mx-auto space-y-4 mt-6">
+        {[...Array(4)].map((_, i) => (
+          <div
+            key={i}
+            className="flex items-start gap-3 p-4 bg-gray-200/60 rounded-xl"
+          >
+            <div className="w-6 h-6 bg-gray-300 rounded-full flex-shrink-0"></div>
+            <div className="flex flex-col w-full gap-2">
+              <div className="flex justify-between">
+                <div className="h-4 w-32 bg-gray-300 rounded"></div>
+                <div className="h-3 w-16 bg-gray-300 rounded"></div>
+              </div>
+              <div className="h-3 w-60 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const NotificationPage = () => {
   const { user, backendUrl } = useContext(AppContext);
@@ -25,16 +71,14 @@ const NotificationPage = () => {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-
   const Navigate = useNavigate();
 
-  // ⏰ Auto-update time every minute
+  // ⏰ Update relative time every minute
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // 🕒 Convert timestamp to relative time
   const timeAgo = (createdAt) => {
     const diffMs = currentTime - new Date(createdAt);
     const seconds = Math.floor(diffMs / 1000);
@@ -50,7 +94,7 @@ const NotificationPage = () => {
     return new Date(createdAt).toLocaleDateString();
   };
 
-  // 🔄 Fetch notifications
+  // 🔄 Fetch all notifications
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(`${backendUrl}/api/notifications/${user.id}`);
@@ -60,16 +104,16 @@ const NotificationPage = () => {
     } catch (err) {
       console.error("Error fetching notifications:", err);
     } finally {
+       setTimeout(() => {
       setLoading(false);
-    }
-  };
+    }, 1000);
+  }};
 
-  // ⚡ WebSocket real-time connection
+  // ⚡ Setup WebSocket
   useEffect(() => {
     if (!user) return;
     const run = async () => {
       await fetchNotifications();
-
       const socket = io(backendUrl, { transports: ["websocket"] });
       socket.emit("register", user.id);
       socket.on("new-notification", (data) => {
@@ -81,7 +125,7 @@ const NotificationPage = () => {
     run();
   }, [user]);
 
-  // ✅ Mark a single notification as read
+  // ✅ Mark single notification as read
   const markAsRead = async (id) => {
     try {
       await axios.patch(`${backendUrl}/api/notifications/${id}/read`);
@@ -104,7 +148,6 @@ const NotificationPage = () => {
           axios.patch(`${backendUrl}/api/notifications/${n._id}/read`)
         )
       );
-
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setFiltered((prev) => prev.map((n) => ({ ...n, isRead: true })));
     } catch (err) {
@@ -112,48 +155,40 @@ const NotificationPage = () => {
     }
   };
 
-  // 🎯 Icon selector
   const renderIcon = (type) => {
     switch (type) {
       case "success":
-        return <CheckCircle className="text-green-600 w-6 h-6 flex-shrink-0" />;
+        return <CheckCircle className="text-green-600 w-6 h-6" />;
       case "error":
-        return <XCircle className="text-red-600 w-6 h-6 flex-shrink-0" />;
+        return <XCircle className="text-red-600 w-6 h-6" />;
       default:
-        return <Info className="text-blue-600 w-6 h-6 flex-shrink-0" />;
+        return <Info className="text-blue-600 w-6 h-6" />;
     }
   };
 
-  // 🔍 Filter notifications (Unread / Read / All)
+  // 🧭 Apply filter
   useEffect(() => {
-    if (filterType === "unread") {
+    if (filterType === "unread")
       setFiltered(notifications.filter((n) => !n.isRead));
-    } else if (filterType === "read") {
+    else if (filterType === "read")
       setFiltered(notifications.filter((n) => n.isRead));
-    } else {
-      setFiltered(notifications);
-    }
+    else setFiltered(notifications);
   }, [filterType, notifications]);
 
-  // ⏳ Loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-      </div>
-    );
-  }
+  // ✨ Skeleton loading
+  if (loading) return <NotificationSkeleton />;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white p-6 sm:p-12 items-center justify-center">
+      {/* 🔙 Back Button */}
       <div
         onClick={() => Navigate("/")}
         className="flex items-center gap-4 mb-8 text-indigo-700 font-semibold text-lg cursor-pointer"
       >
-        {" "}
-        <IoMdReturnLeft className="cursor-pointer" />
+        <IoMdReturnLeft />
         Back
       </div>
+
       <h1 className="text-3xl font-bold text-indigo-700 mb-4 text-center">
         Notifications
       </h1>
@@ -201,7 +236,7 @@ const NotificationPage = () => {
         </button>
       </div>
 
-      {/* 📨 Notifications Section */}
+      {/* 📨 Notifications */}
       {filtered.length === 0 ? (
         <div className="text-center text-gray-500 mt-12">
           <Inbox className="w-12 h-12 mx-auto mb-3 text-gray-400" />
@@ -256,11 +291,10 @@ const NotificationPage = () => {
         </div>
       )}
 
-      {/* 💬 Popup Modal for full message */}
+      {/* 💬 Popup Modal */}
       {selected && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl shadow-2xl w-[90%] sm:w-[450px] relative animate-fadeIn">
-            {/* Close Button */}
             <button
               onClick={() => setSelected(null)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
@@ -268,7 +302,6 @@ const NotificationPage = () => {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Icon + Title */}
             <div className="flex items-center gap-3 mb-4">
               {renderIcon(selected.type)}
               <div>

@@ -23,6 +23,7 @@ import "@fontsource/poppins/400.css";
 import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import NotificationPage from "./pages/Notification.jsx";
 
 const App = () => {
   return (
@@ -114,6 +115,16 @@ const App = () => {
             }
           />
         </Route>
+
+        {/* 🔒 Protected Notifications Page */}
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* 🔒 Protected Upload Page */}
         <Route

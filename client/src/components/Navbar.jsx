@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
+import { Bell } from "lucide-react";
+import { io } from "socket.io-client";
+import axios from "axios";
 
 // Header background images
 import header1 from "../assets/header1.jpg";
@@ -67,6 +70,45 @@ const MOBILE_MENU = [
 const Navbar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [currentBg, setCurrentBg] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+
+  const Navigate = useNavigate();
+  const { user, credits } = useContext(AppContext);
+
+ useEffect(() => {
+   if (!user?.id) return; // ✅ Use correct property
+
+   const fetchUnread = async () => {
+     try {
+       const res = await axios.get(
+         `${import.meta.env.VITE_BACKEND_URL}/api/notifications/${user.id}`
+       );
+       const all = res.data.notifications || [];
+       const unread = all.filter((n) => !n.isRead).length;
+       setUnreadCount(unread);
+     } catch (err) {
+       console.error("Notification fetch error", err);
+     }
+   };
+
+   fetchUnread();
+
+   // Real-time socket
+   const socket = io(import.meta.env.VITE_BACKEND_URL, {
+     transports: ["websocket"],
+   });
+   socket.emit("register", user.id);
+
+   socket.on("new-notification", (data) => {
+     // Increment unread only if it's for this user
+     if (data.userId === user.id) setUnreadCount((prev) => prev + 1);
+   });
+
+   return () => socket.disconnect();
+ }, [user]);
+
 
   // Add this inside Navbar component, before return
   const [scrolled, setScrolled] = useState(false);
@@ -84,10 +126,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
-
-  const Navigate = useNavigate();
-  const { user, credits } = useContext(AppContext);
+   
 
   // Cycle background images every 4s
   useEffect(() => {
@@ -147,6 +186,15 @@ const Navbar = () => {
 
         {/* Right section */}
         <div className="flex items-center sm:gap-12 sm:pr-20">
+          <Link
+            to="/notifications"
+            className="relative mr-3 flex items-center justify-center"
+          >
+            <Bell className="w-6 h-6 sm:w-8 sm:h-8 text-white cursor-pointer" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 block w-3 h-3 rounded-full bg-green-500 border-2 border-white"></span>
+            )}
+          </Link>
           <Link
             to="/buy-credits"
             className="flex gap-1 sm:gap-3 text-[12px] sm:text-[18px] bg-black-400/20 border items-center justify-center mr-2 border-white/50 text-white px-2 py-2 rounded-full font-medium"

@@ -8,6 +8,7 @@ import BtnOwnModel from "../components/BtnOwnModel";
 import FreeToolContainer from "../components/FreeToolsContainer";
 import GoToStudio from "../components/GoToStudioCard";
 import LoaderAnimation from "../components/LoaderAnimation";
+import PaymentPacksSection from "../components/PaymentPacksSection";
 
 const Home = () => {
   const [showLoader, setShowLoader] = useState(true);
@@ -37,6 +38,7 @@ const Home = () => {
       <BtnOwnModel />
       <Carousel />
       <GoToStudio />
+      <PaymentPacksSection />
       <FreeToolContainer />
       <Cardcontainer />
       <Footer />

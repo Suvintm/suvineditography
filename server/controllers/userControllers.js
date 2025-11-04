@@ -101,11 +101,14 @@ const userCredit = async (req, res) => {
       success: true,
       message: "User credit fetched successfully",
       data: {
+        id: user._id, // ✅ include ID
         name: user.name,
         email: user.email,
         credit: user.creditBalance,
+        isAdmin: user.isAdmin || false,
       },
     });
+
   } catch (error) {
     console.error("Signup error:", error.response?.data || error.message);
     toast.error(error?.response?.data?.message || "Something went wrong.");

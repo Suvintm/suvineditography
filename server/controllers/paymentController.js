@@ -2,13 +2,16 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import paymentModel from "../model/paymentModel.js";
 import userModel from "../model/userModel.js";
+import Notification from "../model/Notification.js"; // 🔔 Import notification model
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+// ===============================
 // Create Razorpay order
+// ===============================
 export const createOrder = async (req, res) => {
   try {
     const { amount, credits, packName } = req.body;
@@ -45,7 +48,9 @@ export const createOrder = async (req, res) => {
   }
 };
 
+// ===============================
 // Verify payment and update DB
+// ===============================
 export const verifyPayment = async (req, res) => {
   try {
     const {
@@ -81,7 +86,6 @@ export const verifyPayment = async (req, res) => {
     payment.razorpay_payment_id = razorpay_payment_id;
     payment.razorpay_signature = razorpay_signature;
     payment.status = "paid";
-
     await payment.save();
 
     // Update user credits
@@ -89,21 +93,50 @@ export const verifyPayment = async (req, res) => {
     user.creditBalance += credits;
     await user.save();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `${credits} credits added successfully`,
-      });
+    // 🔔 Create and emit success notification
+    const io = req.app.get("io");
+    const notification = await Notification.create({
+      userId: user._id,
+      title: "Payment Successful 💳",
+      message: `Your payment for ${payment.packName} pack was successful. ${credits} credits added to your account.`,
+      type: "success",
+    });
+    io.to(user._id.toString()).emit("new-notification", notification);
+
+    res.status(200).json({
+      success: true,
+      message: `${credits} credits added successfully`,
+    });
   } catch (error) {
     console.error("Verify payment error:", error);
+
+    // 🔔 Send failure notification
+    try {
+      const io = req.app.get("io");
+      const userId = req.user?.id;
+      if (userId) {
+        const notification = await Notification.create({
+          userId,
+          title: "Payment Failed ❌",
+          message:
+            "There was an issue verifying your payment. Please try again.",
+          type: "error",
+        });
+        io.to(userId.toString()).emit("new-notification", notification);
+      }
+    } catch (notifyError) {
+      console.error("Notification send failed:", notifyError);
+    }
+
     res
       .status(500)
       .json({ success: false, message: "Payment verification failed" });
   }
 };
 
+// ===============================
 // Razorpay webhook handler
+// ===============================
 export const paymentWebhook = async (req, res) => {
   try {
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
@@ -156,11 +189,39 @@ export const paymentWebhook = async (req, res) => {
         user.creditBalance += credits;
         await user.save();
       }
+
+      // 🔔 Send real-time notification for webhook payment success
+      const io = req.app.get("io");
+      const notification = await Notification.create({
+        userId,
+        title: "Payment Captured 💰",
+        message: `Your payment for ${packName} pack has been successfully captured. ${credits} credits added.`,
+        type: "success",
+      });
+      io.to(userId.toString()).emit("new-notification", notification);
     }
 
     res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error("Webhook error:", error);
+
+    // 🔔 Notify user if webhook failed
+    try {
+      const io = req.app.get("io");
+      const userId = req.body?.payload?.payment?.entity?.notes?.userId;
+      if (userId) {
+        const notification = await Notification.create({
+          userId,
+          title: "Payment Error ⚠️",
+          message: "There was an issue processing your payment.",
+          type: "error",
+        });
+        io.to(userId.toString()).emit("new-notification", notification);
+      }
+    } catch (notifyError) {
+      console.error("Webhook notification failed:", notifyError);
+    }
+
     res.status(500).send("Webhook processing failed");
   }
 };
